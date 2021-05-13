@@ -34,6 +34,7 @@ function interface(name) end
 function trait(name) end
 function enum(name) end
 function implements(list) end
+function namespace(name) end
 
 function extends(classname)
 	-- if classname:len() == 0 then error
