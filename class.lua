@@ -26,4 +26,7 @@ function implements(interfacelist)
 end
 
 function new(classname)
+	return function(...)
+		return _G[classname].new(...)
+	end
 end
