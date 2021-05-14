@@ -66,6 +66,18 @@ Object = {
 		end
 	end;
 
+	isclass = function(name)
+		local classref = Object.getclass(name)
+		if classref == Object then
+			return true
+		end
+		local metatable = getmetatable(classref)
+		while metatable ~= nil and metatable.__index ~= Object do
+			metatable = getmetatable(metatable)
+		end
+		return metatable ~= nil
+	end
+
 	createdescriptor = function (descriptor)
 		if not descriptor then
 			return
