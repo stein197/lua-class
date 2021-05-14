@@ -14,7 +14,9 @@ Object = {
 		return metatable ~= nil
 	end;
 
-	clone = function () end;
+	clone = function ()
+		
+	end;
 	new = function(...) end;
 
 	nameisvalid = function (identifier, includedots)
@@ -136,15 +138,6 @@ function class(name)
 	Object.__currentclassname = name
 	return Object.createdescriptor
 end
-
-function import(name) end -- TODO
-function interface(name) end -- TODO
-function trait(name) end -- TODO
-function enum(name) end -- TODO
-function implements(list) end -- TODO
-function try() end -- TODO
-function catch() end -- TODO
-function throw(message) end -- TODO
 
 function extends(classname)
 	Object.__currentnamespace[Object.__currentclassname] = setmetatable(Object.getcurrentclass(), {__index = Object.getclass(classname)})
