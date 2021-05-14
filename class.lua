@@ -6,16 +6,14 @@ Object = {
 	__currentnamespace = _G;
 
 	instanceof = function (self, classname)
-		-- local classref
-		-- local classtype = type(classname)
-		-- if classtype == "string" then
-		-- 	classref = Object.getclassbyname(classname)
-		-- elseif classtype == "table" then
-		-- 	classref = classname
-		-- else
-		-- 	error "Classname \""..classname.."\" is not a string or table"
-		-- end
+		local classref = Object.getclass(classname)
+		local metatable = getmetatable(self)
+		while metatable ~= nil and metatable.__index ~= classref do
+			metatable = getmetatable(metatable)
+		end
+		return metatable ~= nil
 	end;
+
 	clone = function () end;
 	new = function(...) end;
 
@@ -58,9 +56,17 @@ Object = {
 					end
 				end
 			end
-			return currentnamespace[classname]
+			local classref = currentnamespace[classname]
+			if Object.isclass(classref)
+				return classref
+			end
+			return nil
 		elseif classtype == "table" then
-			return classname
+			if Object.isclass(classname) then
+				return classname
+			else
+				return nil
+			end
 		else
 			error("Classname \""..name.."\" is not a string nor a table")
 		end
