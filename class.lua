@@ -66,7 +66,7 @@ Object = {
 		end
 	end;
 
-	isclass = function(name)
+	isclass = function (name)
 		local classref = Object.getclass(name)
 		if classref == Object then
 			return true
