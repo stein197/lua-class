@@ -4,20 +4,83 @@ require "util"
 Object = {
 	__currentclassname = nil;
 	__currentnamespace = _G;
+
 	instanceof = function (self, classname)
 		-- local classref
 		-- local classtype = type(classname)
 		-- if classtype == "string" then
-		-- 	classref = getclassbyname(classname)
+		-- 	classref = Object.getclassbyname(classname)
 		-- elseif classtype == "table" then
 		-- 	classref = classname
 		-- else
 		-- 	error "Classname \""..classname.."\" is not a string or table"
 		-- end
 	end;
-	clone = function ()
+	clone = function () end;
+	new = function(...) end;
+
+	nameisvalid = function (identifier, includedots)
+		local pattern
+		if includedots then
+			pattern = "^[a-zA-Z][a-zA-Z0-9%.]*$"
+		else
+			pattern = "^[a-zA-Z][a-zA-Z0-9]*$"
+		end
+		return identifier:match(pattern)
 	end;
-	new = function(...)
+
+	getcurrentclass = function ()
+		return Object.__currentnamespace[Object.__currentclassname]
+	end;
+
+	-- Returns class by name
+	-- If name is string it resolves relatively to current namespace,
+	-- then relative to global space
+	getclass = function (name)
+		local classtype = type(name)
+		if classtype == "string" then
+			local parts = name:split(".")
+			local nsparts = table.slice(parts, 1, -2)
+			local classname = table.slice(parts, -1)
+			local currentnamespace = Object.__currentnamespace
+			for i, ns in pairs(nsparts) do
+				currentnamespace = currentnamespace[ns]
+				if not currentnamespace then
+					return nil
+				end
+			end
+			if not currentnamespace[classname] then
+				currentnamespace = _G
+				for i, ns in pairs(nsparts) do
+					currentnamespace = currentnamespace[ns]
+					if not currentnamespace then
+						return nil
+					end
+				end
+			end
+			return currentnamespace[classname]
+		elseif classtype == "table" then
+			return classname
+		else
+			error("Classname \""..name.."\" is not a string nor a table")
+		end
+	end;
+
+	createdescriptor = function (descriptor)
+		if not descriptor then
+			return
+		end
+		function descriptor.new(...)
+			local object = {}
+			if descriptor.constructor then
+				descriptor.constructor(object, ...)
+			end
+			return setmetatable(object, {__index = descriptor})
+		end
+		-- local currentclass = Object.getcurrentclass()
+		-- for k, v in pairs(descriptor) do
+		-- 	currentclass[k] = v
+		-- end
 	end
 }
 
@@ -27,7 +90,7 @@ function namespace(name)
 		Object.__currentnamespace = _G
 		return
 	end
-	if not nameisvalid(name) then
+	if not Object.nameisvalid(name) then
 		error("Namespace \""..name.."\" contains invalid characters")
 	end
 	local parts = name:split(".")
@@ -45,15 +108,15 @@ function namespace(name)
 end
 
 function class(name)
-	if not nameisvalid(name) then
+	if not Object.nameisvalid(name) then
 		error("Classname \""..name.."\" contains invalid characters")
 	end
-	if getclass(name) then
+	if Object.getclass(name) then
 		error("Cannot override existing class \""..name.."\"")
 	end
 	Object.__currentnamespace[name] = setmetatable({}, {__index = Object})
 	Object.__currentclassname = name
-	return createdescriptor
+	return Object.createdescriptor
 end
 
 function import(name) end -- TODO
@@ -66,70 +129,6 @@ function catch() end -- TODO
 function throw(message) end -- TODO
 
 function extends(classname)
-	Object.__currentnamespace[Object.__currentclassname] = setmetatable(getcurrentclass(), {__index = getclass(classname)})
-	return createdescriptor
-end
-
-local function createdescriptor(descriptor)
-	if not descriptor then
-		return
-	end
-	function descriptor.new(...)
-		local object = {}
-		if descriptor.constructor then
-			descriptor.constructor(object, ...)
-		end
-		return setmetatable(object, {__index = descriptor})
-	end
-	-- local currentclass = getcurrentclass()
-	-- for k, v in pairs(descriptor) do
-	-- 	currentclass[k] = v
-	-- end
-end
-
--- Returns class by name
--- If name is string it resolves relatively to current namespace,
--- then relative to global space
-local function getclass(name)
-	local classtype = type(name)
-	if classtype == "string" then
-		local parts = name:split(".")
-		local nsparts = table.slice(parts, 1, -2)
-		local classname = table.slice(parts, -1)
-		local currentnamespace = Object.__currentnamespace
-		for i, ns in pairs(nsparts) do
-			currentnamespace = currentnamespace[ns]
-			if not currentnamespace then
-				return nil
-			end
-		end
-		if not currentnamespace[classname] then
-			currentnamespace = _G
-			for i, ns in pairs(nsparts) do
-				currentnamespace = currentnamespace[ns]
-				if not currentnamespace then
-					return nil
-				end
-			end
-		end
-		return currentnamespace[classname]
-	elseif classtype == "table" then
-		return classname
-	else
-		error("Classname \""..name.."\" is not a string nor a table")
-	end
-end
-
-local function getcurrentclass()
-	return Object.__currentnamespace[Object.__currentclassname]
-end
-
-local function nameisvalid(identifier, includedots)
-	local pattern
-	if includedots then
-		pattern = "^[a-zA-Z][a-zA-Z0-9%.]+$"
-	else
-		pattern = "^[a-zA-Z][a-zA-Z0-9]+$"
-	end
-	return identifier:match(pattern)
+	Object.__currentnamespace[Object.__currentclassname] = setmetatable(Object.getcurrentclass(), {__index = Object.getclass(classname)})
+	return Object.createdescriptor
 end
