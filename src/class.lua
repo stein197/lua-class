@@ -45,16 +45,6 @@ Object = {
 
 ClassUtil = {
 
-	nameisvalid = function (identifier, includedots)
-		local pattern
-		if includedots then
-			pattern = "^[a-zA-Z][a-zA-Z0-9%.]*$"
-		else
-			pattern = "^[a-zA-Z][a-zA-Z0-9]*$"
-		end
-		return identifier:match(pattern)
-	end;
-
 	findClass = function (name)
 		local classtype = type(name)
 		if classtype == "string" then
@@ -65,10 +55,23 @@ ClassUtil = {
 			error("Classname \""..name.."\" is not a string nor a table")
 		end
 	end;
+
+	Naming = {
+
+		isValid = function (identifier, includedots)
+			local pattern
+			if includedots then
+				pattern = "^[a-zA-Z][a-zA-Z0-9%.]*$"
+			else
+				pattern = "^[a-zA-Z][a-zA-Z0-9]*$"
+			end
+			return identifier:match(pattern)
+		end;
+	};
 }
 
 function class(name)
-	if not ClassUtil.nameisvalid(name) then
+	if not ClassUtil.Naming.isValid(name) then
 		error("Classname \""..name.."\" contains invalid characters")
 	end
 	if ClassUtil.findClass(name) then
