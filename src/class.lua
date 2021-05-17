@@ -25,17 +25,23 @@ function table.slice(tbl, from, to)
 end
 
 Object = {
-	__currentclassname = nil;
-	__currentnamespace = _G;
 
 	instanceof = function (self, classname)
-		local classref = Object.getclass(classname)
+		local classref = ClassUtil.getclass(classname)
 		local metatable = getmetatable(self)
 		while metatable ~= nil and metatable.__index ~= classref do
 			metatable = getmetatable(metatable)
 		end
 		return metatable ~= nil
 	end;
+
+	getclass = function (self)
+	end
+}
+
+local ClassUtil = {
+	__currentclassname = nil;
+	__currentnamespace = _G;
 
 	nameisvalid = function (identifier, includedots)
 		local pattern
@@ -48,9 +54,22 @@ Object = {
 	end;
 
 	getcurrentclass = function ()
-		return Object.__currentnamespace[Object.__currentclassname]
+		return ClassUtil.__currentnamespace[ClassUtil.__currentclassname]
 	end;
 
+	createdescriptor = function (descriptor)
+		if not descriptor then
+			return
+		end
+		function descriptor.new(...)
+			local object = {}
+			if descriptor.constructor then
+				descriptor.constructor(object, ...)
+			end
+			return setmetatable(object, {__index = descriptor})
+		end
+		setmetatable(ClassUtil.getcurrentclass(), {__index = descriptor, __call = descriptor.new})
+	end;
 	-- Returns class by name
 	-- If name is string it resolves relatively to current namespace,
 	-- then relative to global space
@@ -60,7 +79,7 @@ Object = {
 			local parts = name:split(".")
 			local nsparts = table.slice(parts, 1, -2)
 			local classname = table.slice(parts, -1)
-			local currentnamespace = Object.__currentnamespace
+			local currentnamespace = ClassUtil.__currentnamespace
 			for i, ns in pairs(nsparts) do
 				currentnamespace = currentnamespace[ns]
 				if not currentnamespace then
@@ -83,33 +102,15 @@ Object = {
 			error("Classname \""..name.."\" is not a string nor a table")
 		end
 	end;
-
-	-- TODO: __call metamethod
-	createdescriptor = function (descriptor)
-		if not descriptor then
-			return
-		end
-		function descriptor.new(...)
-			local object = {}
-			if descriptor.constructor then
-				descriptor.constructor(object, ...)
-			end
-			return setmetatable(object, {__index = descriptor})
-		end
-		-- local currentclass = Object.getcurrentclass()
-		-- for k, v in pairs(descriptor) do
-		-- 	currentclass[k] = v
-		-- end
-	end
 }
 
 -- Creates a namespace or switches between them
 function namespace(name)
 	if name:len() == 0 then
-		Object.__currentnamespace = _G
+		ClassUtil.__currentnamespace = _G
 		return
 	end
-	if not Object.nameisvalid(name, true) then
+	if not ClassUtil.nameisvalid(name, true) then
 		error("Namespace \""..name.."\" contains invalid characters")
 	end
 	local parts = name:split(".")
@@ -123,22 +124,22 @@ function namespace(name)
 			error("Cannot define a namespace \""..name.."\". Key \""..v.."\" already exists")
 		end
 	end
-	Object.__currentnamespace = currentnamespace
+	ClassUtil.__currentnamespace = currentnamespace
 end
 
 function class(name)
-	if not Object.nameisvalid(name) then
+	if not ClassUtil.nameisvalid(name) then
 		error("Classname \""..name.."\" contains invalid characters")
 	end
-	if Object.getclass(name) then
+	if ClassUtil.getclass(name) then
 		error("Cannot override existing class \""..name.."\"")
 	end
-	Object.__currentnamespace[name] = setmetatable({}, {__index = Object})
-	Object.__currentclassname = name
-	return Object.createdescriptor
+	ClassUtil.__currentnamespace[name] = setmetatable({}, {__index = Object})
+	ClassUtil.__currentclassname = name
+	return ClassUtil.createdescriptor
 end
 
 function extends(classname)
-	Object.__currentnamespace[Object.__currentclassname] = setmetatable(Object.getcurrentclass(), {__index = Object.getclass(classname)})
-	return Object.createdescriptor
+	ClassUtil.__currentnamespace[ClassUtil.__currentclassname] = setmetatable(ClassUtil.getcurrentclass(), {__index = ClassUtil.getclass(classname)})
+	return ClassUtil.createdescriptor
 end
