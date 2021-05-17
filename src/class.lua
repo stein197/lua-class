@@ -1,5 +1,28 @@
--- TODO: Use: debug and debug.getInfo, __index for _G, setfenv
-require "util"
+-- TODO: Use: debug and debug.getInfo, __index for _G, setfenv, add new() and clone()
+function string.split(self, separator)
+	separator = separator or "%s"
+	local parts = {}
+	for part in self:gmatch("([^"..separator.."]*)") do
+		table.insert(parts, part)
+	end
+	return parts
+end
+
+function table.slice(tbl, from, to)
+	local sliced = {}
+	from = from or 1
+	to = to or #tbl
+	if from < 0 then
+		from = #tbl + from + 1
+	end
+	if to < 0 then
+		to = #tbl + to + 1
+	end
+	for i = from, to do
+		table.insert(sliced, tbl[i])
+	end
+	return sliced
+end
 
 Object = {
 	__currentclassname = nil;
@@ -13,11 +36,6 @@ Object = {
 		end
 		return metatable ~= nil
 	end;
-
-	clone = function ()
-		
-	end;
-	new = function(...) end;
 
 	nameisvalid = function (identifier, includedots)
 		local pattern
@@ -58,34 +76,15 @@ Object = {
 					end
 				end
 			end
-			local classref = currentnamespace[classname]
-			if Object.isclass(classref)
-				return classref
-			end
-			return nil
+			return currentnamespace[classname]
 		elseif classtype == "table" then
-			if Object.isclass(classname) then
-				return classname
-			else
-				return nil
-			end
+			return name
 		else
 			error("Classname \""..name.."\" is not a string nor a table")
 		end
 	end;
 
-	isclass = function (name)
-		local classref = Object.getclass(name)
-		if classref == Object then
-			return true
-		end
-		local metatable = getmetatable(classref)
-		while metatable ~= nil and metatable.__index ~= Object do
-			metatable = getmetatable(metatable)
-		end
-		return metatable ~= nil
-	end
-
+	-- TODO: __call metamethod
 	createdescriptor = function (descriptor)
 		if not descriptor then
 			return
@@ -110,7 +109,7 @@ function namespace(name)
 		Object.__currentnamespace = _G
 		return
 	end
-	if not Object.nameisvalid(name) then
+	if not Object.nameisvalid(name, true) then
 		error("Namespace \""..name.."\" contains invalid characters")
 	end
 	local parts = name:split(".")
@@ -121,7 +120,7 @@ function namespace(name)
 		end
 		currentnamespace = currentnamespace[v]
 		if type(currentnamespace) ~= "table" then
-			error("Cannot define a namespace \""..name.."\". Key \""..v.."\" exists and it is not a table")
+			error("Cannot define a namespace \""..name.."\". Key \""..v.."\" already exists")
 		end
 	end
 	Object.__currentnamespace = currentnamespace
