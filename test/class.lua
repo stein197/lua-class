@@ -1,26 +1,18 @@
 LuaUnit = dofile "lib/luaunit.lua"
 dofile "src/class.lua"
 dofile "test/SimpleClass.lua"
+dofile "test/ClassExtends.lua"
 
-class "A" {
-
-	returnSelf = function (self)
-		return self
-	end;
-
-	methodA = function (self)
-		return "A"
-	end;
-}
+class "A" {}
 
 class "B" {
 
-	returnSelf = function (self)
-		return self
+	method1 = function (self)
+		return "method 1"
 	end;
 
-	methodB = function (self)
-		return "B"
+	method2 = function (self)
+		return "method 2"
 	end;
 }
 
@@ -28,12 +20,21 @@ class "Constructor" {
 
 	a = nil;
 	b = nil;
-	sum = nil;
 
 	constructor = function (self, a, b)
 		self.a = a
 		self.b = b
-		self.sum = a + b
+	end;
+	
+	getSum = function (self)
+		return self.a + self.b
+	end;
+}
+
+class "C" extends "B" {
+
+	method1 = function (self)
+		return "overrided"
 	end;
 }
 

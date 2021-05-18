@@ -2,7 +2,7 @@ TestClass = {
 	testExistence = function ()
 		LuaUnit.assertTable(A)
 		LuaUnit.assertTable(B)
-		LuaUnit.assertNil(C)
+		LuaUnit.assertNil(NotExistingClass)
 	end;
 	testInstantiating = function ()
 		LuaUnit.assertTable(A())
@@ -12,7 +12,18 @@ TestClass = {
 		local var = Constructor(2, 3)
 		LuaUnit.assertEquals(var.a, 2)
 		LuaUnit.assertEquals(var.b, 3)
-		LuaUnit.assertEquals(var.sum, 5)
+	end;
+	testConstructorCreatesDifferentInstances = function ()
+		local a = Constructor(2, 3)
+		local b = Constructor(5, 7)
+		LuaUnit.assertFalse(a.a == b.a)
+		LuaUnit.assertFalse(a.b == b.b)
+	end;
+	testMethodIsCorrect = function ()
+		local a = Constructor(2, 3)
+		local b = Constructor(5, 7)
+		LuaUnit.assertEquals(a:getSum(), 5)
+		LuaUnit.assertEquals(b:getSum(), 12)
 	end;
 	testInstantiaingNotModifyingClass = function ()
 		Constructor(2, 3)
@@ -77,4 +88,5 @@ TestClass = {
 		LuaUnit.assertEquals(Object.getMeta().name, "Object")
 		LuaUnit.assertEquals(B():getClass().getMeta().name, "B")
 	end;
+	testSelfIsCorrect = function () end; -- TODO
 }

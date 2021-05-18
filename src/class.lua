@@ -53,6 +53,8 @@ Object = {
 
 ClassUtil = {
 
+	__currentClassName = nil;
+
 	findClass = function (name)
 		local classtype = type(name)
 		if classtype == "string" then
@@ -62,6 +64,24 @@ ClassUtil = {
 		else
 			error("Classname \""..name.."\" is not a string nor a table")
 		end
+	end;
+	
+	createClass = function (descriptor)
+		local className = ClassUtil.__currentClassName
+		_G[className] = setmetatable(descriptor, {
+			__index = _G[className];
+			__call = function (...)
+				local object = setmetatable({}, {__index = descriptor})
+				if descriptor.constructor then
+					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
+				end
+				function object.getMeta()
+					return object.__meta
+				end
+				object.__meta = {}
+				return object
+			end
+		})
 	end;
 
 	Naming = {
@@ -90,20 +110,15 @@ function class(name)
 	function classref.getMeta()
 		return classref.__meta
 	end
-	return function (descriptor)
-		_G[name] = setmetatable(descriptor, {
-			__index = _G[name];
-			__call = function (...)
-				local object = setmetatable({}, {__index = descriptor})
-				if descriptor.constructor then
-					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
-				end
-				function object.getMeta()
-					return object.__meta
-				end
-				object.__meta = {}
-				return object
-			end
-		})
+	ClassUtil.__currentClassName = name
+	return ClassUtil.createClass
+end
+
+function extends(className)
+	local parentClass = ClassUtil.findClass(className)
+	if not parentClass then
+		error("Cannot find class \""..className.."\"")
 	end
+	_G[ClassUtil.__currentClassName] = setmetatable(_G[ClassUtil.__currentClassName], {__index = parentClass})
+	return ClassUtil.createClass
 end
