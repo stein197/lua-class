@@ -25,6 +25,10 @@ end
 
 Object = {
 
+	__meta = {
+		name = "Object"
+	};
+
 	instanceof = function (self, classname)
 		local classref = ClassUtil.findClass(classname)
 		local metatable = getmetatable(self)
@@ -40,6 +44,10 @@ Object = {
 			return metatable.__index
 		end
 		return nil
+	end;
+
+	getMeta = function ()
+		return Object.__meta
 	end;
 }
 
@@ -77,7 +85,11 @@ function class(name)
 	if ClassUtil.findClass(name) then
 		error("Cannot declare class. Variable or class with name \""..name.."\" already exists")
 	end
-	_G[name] = setmetatable({}, {__index = Object})
+	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
+	local classref = _G[name]
+	function classref.getMeta()
+		return classref.__meta
+	end
 	return function (descriptor)
 		_G[name] = setmetatable(descriptor, {
 			__index = _G[name];
@@ -86,6 +98,10 @@ function class(name)
 				if descriptor.constructor then
 					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
 				end
+				function object.getMeta()
+					return object.__meta
+				end
+				object.__meta = {}
 				return object
 			end
 		})

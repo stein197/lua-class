@@ -9,5 +9,6 @@
 - [ ] Add traits;
 - [ ] Add inner classes (via lastclassname as table instead of string);
 - [ ] Add `clone()` method;
-- [ ] Optionally add an ability to get class name;
+- [x] Optionally add an ability to get class name;
+- [ ] Try to add static fields;
 - [ ] Use reflection - debug and debug.getInfo, __index for _G, setfenv and etc.;

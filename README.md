@@ -30,3 +30,20 @@ a:instanceof(Object) -- True
 a:instanceof(B) -- False
 a:instanceof(a:getClass()) -- True
 ```
+There is also "static" method `getMeta()` that's called on classes. It returns additional metainfo about class:
+```lua
+A.getMeta() -- {name = "A"}
+```
+Calling on class instance returns empty table:
+```lua
+A():getMeta() -- {}
+```
+If there is a try to create already existing class, an error will be thrown:
+```lua
+class "A" {--[[ ... ]]}
+class "A" {} -- Throws "Cannot declare class. Variable or class with name "A" already exists"
+```
+There is a restriction on class names. They only can contain alphanumeric characters and cannot start with number:
+```lua
+class "0 numeric.dot" {} -- Throws "Cannot declare class. Classname "0 numeric" contains invalid characters"
+```

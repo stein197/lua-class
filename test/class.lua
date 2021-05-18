@@ -106,6 +106,15 @@ TestClass = {
 			end
 		)
 	end;
+	testGetMetaOnInstanceIsEmpty = function ()
+		LuaUnit.assertEquals(A():getMeta(), {})
+	end;
+	testGetMetaOnClass = function ()
+		LuaUnit.assertEquals(A.getMeta(), {name = "A"})
+		LuaUnit.assertEquals(Constructor.getMeta().name, "Constructor")
+		LuaUnit.assertEquals(Object.getMeta().name, "Object")
+		LuaUnit.assertEquals(B():getClass().getMeta().name, "B")
+	end;
 }
 
 local runner = LuaUnit.LuaUnit.new()
