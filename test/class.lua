@@ -84,6 +84,28 @@ TestClass = {
 		LuaUnit.assertEquals(a:getClass(), A)
 		LuaUnit.assertEquals(b:getClass(), B)
 	end;
+	testClassRedeclareThrowsError = function ()
+		LuaUnit.assertErrorMsgContains(
+			"Cannot declare class. Variable or class with name \"A\" already exists",
+			function ()
+				class "A" {}
+			end
+		)
+	end;
+	testClassInvalidNameThrowsError = function ()
+		LuaUnit.assertErrorMsgContains(
+			"Cannot declare class. Classname \"invalid name\" contains invalid characters",
+			function ()
+				class "invalid name" {}
+			end
+		)
+		LuaUnit.assertErrorMsgContains(
+			"Cannot declare class. Classname \"0numeric0\" contains invalid characters",
+			function ()
+				class "0numeric0" {}
+			end
+		)
+	end;
 }
 
 local runner = LuaUnit.LuaUnit.new()

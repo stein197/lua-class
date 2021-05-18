@@ -40,7 +40,7 @@ Object = {
 			return metatable.__index
 		end
 		return nil
-	end
+	end;
 }
 
 ClassUtil = {
@@ -72,10 +72,10 @@ ClassUtil = {
 
 function class(name)
 	if not ClassUtil.Naming.isValid(name) then
-		error("Classname \""..name.."\" contains invalid characters")
+		error("Cannot declare class. Classname \""..name.."\" contains invalid characters")
 	end
 	if ClassUtil.findClass(name) then
-		error("Cannot override existing class \""..name.."\"")
+		error("Cannot declare class. Variable or class with name \""..name.."\" already exists")
 	end
 	_G[name] = setmetatable({}, {__index = Object})
 	return function (descriptor)
