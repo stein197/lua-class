@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.3.0
+### Features
+- Added new Class API. It's accessible from `Class` class;
 ## 1.2.0
 ### Features
 - Added inheritance support;

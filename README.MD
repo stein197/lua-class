@@ -31,14 +31,6 @@ a:instanceof(Object) -- True
 a:instanceof(B) -- False
 a:instanceof(a:getClass()) -- True
 ```
-There is also "static" method `getMeta()` that's called on classes. It returns additional metainfo about class:
-```lua
-A.getMeta() -- {name = "A"}
-```
-Calling on class instance returns empty table:
-```lua
-A():getMeta() -- {}
-```
 If there is a try to create already existing class, an error will be thrown:
 ```lua
 class "A" {--[[ ... ]]}
@@ -61,9 +53,13 @@ class "B" extends "A" {
 The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from B class". There is also support for constructor and property overriding.
 
 ## API
-The next table shows the API that can be used. If method is called as an instance (via `:`) - then it can be called on instances. If it's written via dot, then it's a static member.
-|Method name|Description|
+|Method|Description|
 |---|---|
 |`Object():getClass()`|Returns reference to a class that created current instance|
 |`Object():instanceof(classname)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
-|`Object.getMeta(key)`|Returns meta information about class as a table. If `key` is supplied the the specific key of table is returned. Current fields are `name`, `extends`|
+There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
+|Method|Description|
+|---|---|
+|`Class():getMeta()`|Returns metainfo about class as a table. The returned table contains fields `name`, `parent`|
+|`Class():getName()`|Same as `Class():getMeta("name")`|
+|`Class():getParent()`|Same as `Class():getMeta("parent")`|
