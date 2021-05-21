@@ -30,12 +30,22 @@ Object = {
 	};
 
 	instanceof = function (self, classname)
-		local classref = ClassUtil.findClass(classname)
-		local metatable = getmetatable(self)
-		while metatable ~= nil and metatable.__index ~= classref do
-			metatable = getmetatable(metatable.__index)
+		if not classname then
+			error "Supplied argument is nil"
 		end
-		return metatable ~= nil
+		local ref = ClassUtil.findType(classname)
+		if not ref then
+			if type(classname) == "string" then
+				error("Cannot find class \""..classname.."\"")
+			else
+				error("Cannot find class")
+			end
+		end
+		local metaTable = getmetatable(self)
+		while metaTable ~= nil and metaTable.__index ~= ref do
+			metaTable = getmetatable(metaTable.__index)
+		end
+		return metaTable ~= nil
 	end;
 
 	getClass = function (self)
@@ -51,15 +61,20 @@ ClassUtil = {
 
 	__currentClassName = nil;
 
-	findClass = function (name)
-		local classtype = type(name)
-		if classtype == "string" then
-			return _G[name]
-		elseif classtype == "table" then
-			return name
+	findType = function (name)
+		local nameType = type(name)
+		local ref
+		if nameType == "string" then
+			ref = _G[name]
+		elseif nameType == "table" then
+			ref = name
 		else
 			error("Classname \""..name.."\" is not a string nor a table")
 		end
+		if not ref or not ref.__meta then
+			return nil
+		end
+		return ref
 	end;
 	
 	createClass = function (descriptor)
@@ -95,7 +110,7 @@ function class(name)
 	if not ClassUtil.Naming.isValid(name) then
 		error("Cannot declare class. Classname \""..name.."\" contains invalid characters")
 	end
-	if ClassUtil.findClass(name) then
+	if ClassUtil.findType(name) then
 		error("Cannot declare class. Variable or class with name \""..name.."\" already exists")
 	end
 	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
@@ -105,7 +120,7 @@ function class(name)
 end
 
 function extends(className)
-	local parentClass = ClassUtil.findClass(className)
+	local parentClass = ClassUtil.findType(className)
 	if not parentClass then
 		error("Cannot find class \""..className.."\"")
 	end
@@ -123,7 +138,7 @@ class "Class" {
 		if not ref then
 			error("Class reference cannot be nil")
 		end
-		self.ref = ClassUtil.findClass(ref)
+		self.ref = ClassUtil.findType(ref)
 		if not self.ref then
 			error("Cannot find class \""..ref.."\"")
 		end
