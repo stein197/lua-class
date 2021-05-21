@@ -145,7 +145,11 @@ class "Class" {
 	end;
 
 	getMeta = function (self, key)
-		return key and self.ref.__meta[key] or self.ref.__meta
+		if key then
+			return self.ref.__meta[key]
+		else
+			return self.ref.__meta
+		end
 	end;
 
 	getParent = function (self)
