@@ -71,6 +71,7 @@ ClassUtil = {
 				if descriptor.constructor then
 					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
 				end
+				object.__meta = {}
 				return object
 			end
 		})
