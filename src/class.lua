@@ -119,13 +119,12 @@ class "Class" {
 	ref = nil;
 
 	constructor = function (self, ref)
+		if not ref then
+			error("Class reference cannot be nil")
+		end
 		self.ref = ClassUtil.findClass(ref)
 		if not self.ref then
-			if type(ref) == "string" then
-				error("Cannot find class \""..ref.."\"")
-			else
-				error("Cannot find class")
-			end
+			error("Cannot find class \""..ref.."\"")
 		end
 	end;
 
