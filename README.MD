@@ -57,6 +57,7 @@ The method `echo` overrides the parent's one. If we omit the method, then it'll 
 |---|---|
 |`Object():getClass()`|Returns reference to a class that created current instance|
 |`Object():instanceof(classname)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
+
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
 |Method|Description|
 |---|---|
