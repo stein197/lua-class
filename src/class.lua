@@ -90,6 +90,7 @@ ClassUtil = {
 				return object
 			end
 		})
+		ClassUtil.__lastTypeName = nil
 	end;
 
 	Naming = {
