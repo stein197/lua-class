@@ -1,4 +1,9 @@
 # CHANGELOG
+## 1.2.0
+### Features
+- Added inheritance support;
+- Added new field to class meta table - `extends`, which contains a reference to the parent class;
+- Now there is ability to retrieve specific field of meta by passing key to `Object.getMeta(key)` method;
 ## 1.1.0
 ### Features
 - Added `Object.getMeta()` method to get class meta info;

@@ -1,4 +1,5 @@
 # Lua OOP emulator
+## Basic concepts
 This simple lua package allows to emulate object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project and use it like follows:
 ```lua
 class "A" {
@@ -47,3 +48,22 @@ There is a restriction on class names. They only can contain alphanumeric charac
 ```lua
 class "0 numeric.dot" {} -- Throws "Cannot declare class. Classname "0 numeric" contains invalid characters"
 ```
+## Inheritance
+This package also supports inheritance:
+```lua
+class "B" extends "A" {
+
+	echo = function ()
+		print "Echo from B class"
+	end
+}
+```
+The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from B class". There is also support for constructor and property overriding.
+
+## API
+The next table shows the API that can be used. If method is called as an instance (via `:`) - then it can be called on instances. If it's written via dot, then it's a static member.
+|Method name|Description|
+|---|---|
+|`Object():getClass()`|Returns reference to a class that created current instance|
+|`Object():instanceof(classname)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
+|`Object.getMeta(key)`|Returns meta information about class as a table. If `key` is supplied the the specific key of table is returned. Current fields are `name`, `extends`|

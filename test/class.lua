@@ -31,10 +31,34 @@ class "Constructor" {
 	end;
 }
 
+class "DefaultProperties" {
+
+	a = 2;
+	b = 3;
+}
+
+class "ChildDefaultProperties" extends "DefaultProperties" {}
+
+class "ChildOverrideDefaultProperties" extends "DefaultProperties" {
+	
+	a = "a";
+	b = "b";
+}
+
 class "C" extends "B" {
 
 	method1 = function (self)
 		return "overrided"
+	end;
+}
+
+class "ConstructorChild" extends "Constructor" {}
+
+class "ChildOverrideConstructor" extends "Constructor" {
+
+	constructor = function (self)
+		self.a = 0
+		self.b = 0
 	end;
 }
 

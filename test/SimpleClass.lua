@@ -88,5 +88,8 @@ TestClass = {
 		LuaUnit.assertEquals(Object.getMeta().name, "Object")
 		LuaUnit.assertEquals(B():getClass().getMeta().name, "B")
 	end;
-	testSelfIsCorrect = function () end; -- TODO
+	testInstanceContainsDefaultProperties = function ()
+		LuaUnit.assertEquals(DefaultProperties().a, 2)
+		LuaUnit.assertEquals(DefaultProperties().b, 3)
+	end;
 }

@@ -46,8 +46,8 @@ Object = {
 		return nil
 	end;
 
-	getMeta = function ()
-		return Object.__meta
+	getMeta = function (name)
+		return name and Object.__meta[name] or Object.__meta
 	end;
 }
 
@@ -107,8 +107,8 @@ function class(name)
 	end
 	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
 	local classref = _G[name]
-	function classref.getMeta()
-		return classref.__meta
+	function classref.getMeta(prop)
+		return prop and classref.__meta[prop] or classref.__meta
 	end
 	ClassUtil.__currentClassName = name
 	return ClassUtil.createClass
@@ -119,6 +119,8 @@ function extends(className)
 	if not parentClass then
 		error("Cannot find class \""..className.."\"")
 	end
-	_G[ClassUtil.__currentClassName] = setmetatable(_G[ClassUtil.__currentClassName], {__index = parentClass})
+	local currentClass = _G[ClassUtil.__currentClassName]
+	currentClass.__meta.extends = parentClass
+	_G[ClassUtil.__currentClassName] = setmetatable(currentClass, {__index = parentClass})
 	return ClassUtil.createClass
 end
