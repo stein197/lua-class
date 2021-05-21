@@ -59,7 +59,7 @@ Object = {
 
 ClassUtil = {
 
-	__currentClassName = nil;
+	__lastTypeName = nil;
 
 	findType = function (name)
 		local nameType = type(name)
@@ -78,7 +78,7 @@ ClassUtil = {
 	end;
 	
 	createClass = function (descriptor)
-		local className = ClassUtil.__currentClassName
+		local className = ClassUtil.__lastTypeName
 		_G[className] = setmetatable(descriptor, {
 			__index = _G[className];
 			__call = function (...)
@@ -115,7 +115,7 @@ function class(name)
 	end
 	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
 	local classref = _G[name]
-	ClassUtil.__currentClassName = name
+	ClassUtil.__lastTypeName = name
 	return ClassUtil.createClass
 end
 
@@ -124,9 +124,9 @@ function extends(className)
 	if not parentClass then
 		error("Cannot find class \""..className.."\"")
 	end
-	local currentClass = _G[ClassUtil.__currentClassName]
+	local currentClass = _G[ClassUtil.__lastTypeName]
 	currentClass.__meta.parent = parentClass
-	_G[ClassUtil.__currentClassName] = setmetatable(currentClass, {__index = parentClass})
+	_G[ClassUtil.__lastTypeName] = setmetatable(currentClass, {__index = parentClass})
 	return ClassUtil.createClass
 end
 
