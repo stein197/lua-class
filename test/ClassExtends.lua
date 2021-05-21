@@ -38,10 +38,10 @@ TestClassExtends = {
 		LuaUnit.assertEquals(ChildOverrideDefaultProperties().b, "b")
 	end;
 
-	testMetaContainsExtendsReference = function ()
-		LuaUnit.assertEquals(C.getMeta().extends.getMeta("name"), "B")
-		LuaUnit.assertEquals(C.getMeta("extends"), B)
-		LuaUnit.assertEquals(C.getMeta("extends").getMeta().name, "B")
+	testMetaContainsParentReference = function ()
+		LuaUnit.assertEquals(Class(Class(C):getMeta().parent):getMeta("name"), "B")
+		LuaUnit.assertEquals(Class(C):getMeta("parent"), B)
+		LuaUnit.assertEquals(Class(Class(C):getMeta("parent")):getMeta().name, "B")
 	end;
 
 	testInstanceof = function ()

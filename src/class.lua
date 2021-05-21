@@ -45,10 +45,6 @@ Object = {
 		end
 		return nil
 	end;
-
-	getMeta = function (name)
-		return name and Object.__meta[name] or Object.__meta
-	end;
 }
 
 ClassUtil = {
@@ -75,10 +71,6 @@ ClassUtil = {
 				if descriptor.constructor then
 					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
 				end
-				function object.getMeta()
-					return object.__meta
-				end
-				object.__meta = {}
 				return object
 			end
 		})
@@ -107,9 +99,6 @@ function class(name)
 	end
 	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
 	local classref = _G[name]
-	function classref.getMeta(prop)
-		return prop and classref.__meta[prop] or classref.__meta
-	end
 	ClassUtil.__currentClassName = name
 	return ClassUtil.createClass
 end
@@ -120,7 +109,35 @@ function extends(className)
 		error("Cannot find class \""..className.."\"")
 	end
 	local currentClass = _G[ClassUtil.__currentClassName]
-	currentClass.__meta.extends = parentClass
+	currentClass.__meta.parent = parentClass
 	_G[ClassUtil.__currentClassName] = setmetatable(currentClass, {__index = parentClass})
 	return ClassUtil.createClass
 end
+
+class "Class" {
+
+	ref = nil;
+
+	constructor = function (self, ref)
+		self.ref = ClassUtil.findClass(ref)
+		if not self.ref then
+			if type(ref) == "string" then
+				error("Cannot find class \""..ref.."\"")
+			else
+				error("Cannot find class")
+			end
+		end
+	end;
+
+	getMeta = function (self, key)
+		return key and self.ref.__meta[key] or self.ref.__meta
+	end;
+
+	getParent = function (self)
+		return self.getMeta("parent")
+	end;
+
+	getName = function (self)
+		return self.getMeta("name")
+	end;
+}

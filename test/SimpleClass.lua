@@ -79,14 +79,11 @@ TestClass = {
 			end
 		)
 	end;
-	testGetMetaOnInstanceIsEmpty = function ()
-		LuaUnit.assertEquals(A():getMeta(), {})
-	end;
 	testGetMetaOnClass = function ()
-		LuaUnit.assertEquals(A.getMeta(), {name = "A"})
-		LuaUnit.assertEquals(Constructor.getMeta().name, "Constructor")
-		LuaUnit.assertEquals(Object.getMeta().name, "Object")
-		LuaUnit.assertEquals(B():getClass().getMeta().name, "B")
+		LuaUnit.assertEquals(Class(A):getMeta(), {name = "A"})
+		LuaUnit.assertEquals(Class(Constructor):getMeta().name, "Constructor")
+		LuaUnit.assertEquals(Class(Object):getMeta().name, "Object")
+		LuaUnit.assertEquals(Class(B():getClass()):getMeta().name, "B")
 	end;
 	testInstanceContainsDefaultProperties = function ()
 		LuaUnit.assertEquals(DefaultProperties().a, 2)
