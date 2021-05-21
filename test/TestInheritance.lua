@@ -1,4 +1,4 @@
-TestClassExtends = {
+TestInheritance = {
 
 	testExtendingNotExistingClassThrowsError = function ()
 		LuaUnit.assertErrorMsgContains(

@@ -1,7 +1,7 @@
 LuaUnit = dofile "lib/luaunit.lua"
 dofile "src/class.lua"
-dofile "test/SimpleClass.lua"
-dofile "test/ClassExtends.lua"
+dofile "test/TestClass.lua"
+dofile "test/TestInheritance.lua"
 
 class "A" {}
 
