@@ -134,10 +134,10 @@ class "Class" {
 	end;
 
 	getParent = function (self)
-		return self.getMeta("parent")
+		return self:getMeta("parent")
 	end;
 
 	getName = function (self)
-		return self.getMeta("name")
+		return self:getMeta("name")
 	end;
 }
