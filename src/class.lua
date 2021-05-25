@@ -145,13 +145,12 @@ function switch(variable)
 			else
 				matches = variable == case
 			end
-			if not matches then
-				return
-			end
-			if type(value) == "function" then
-				return value()
-			else
-				return value
+			if matches then
+				if type(value) == "function" then
+					return value()
+				else
+					return value
+				end
 			end
 		end
 	end
