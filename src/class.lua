@@ -131,6 +131,32 @@ function extends(className)
 	return ClassUtil.createClass
 end
 
+function switch(variable)
+	return function (map)
+		for case, value in pairs(map) do
+			local matches = false
+			if type(case) == "table" then
+				for k, v in pairs(case) do
+					if v == variable then
+						matches = true
+						break
+					end
+				end
+			else
+				matches = variable == case
+			end
+			if not matches then
+				return
+			end
+			if type(value) == "function" then
+				return value()
+			else
+				return value
+			end
+		end
+	end
+end
+
 class "Class" {
 
 	ref = nil;
