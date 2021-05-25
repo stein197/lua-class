@@ -3,6 +3,7 @@ dofile "src/class.lua"
 dofile "test/TestClass.lua"
 dofile "test/TestInheritance.lua"
 dofile "test/TestAPI.lua"
+dofile "test/TestSwitch.lua"
 
 class "A" {}
 
