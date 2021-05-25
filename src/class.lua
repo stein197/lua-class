@@ -135,7 +135,7 @@ function switch(variable)
 	return function (map)
 		for case, value in pairs(map) do
 			local matches = false
-			if type(case) == "table" then
+			if type(case) == "table" and not case.__meta then
 				for k, v in pairs(case) do
 					if v == variable then
 						matches = true

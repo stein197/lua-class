@@ -1,3 +1,4 @@
+-- TODO: Add instance switches
 TestSwitch = {
 
 	testSimple = function ()

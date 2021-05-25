@@ -52,6 +52,27 @@ class "B" extends "A" {
 ```
 The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from B class". There is also support for constructor and property overriding.
 
+## Switch statement
+You can create switch-like statements and even expressions using function `switch`:
+```lua
+local var = "b"
+switch (var) {
+	a = 1; -- Use string key
+	[1] = 2; -- Or numeric one
+	[Object()] = 3; -- Or even class instances
+	[{"b", "c"}] = function () -- Use multiple values. Mostly functions will be used as code block
+		print("Switch!") -- Prints "Switch!"
+	end;
+}
+-- Or even use it as expression
+local var = switch "b" {
+	a = 1;
+	b = 2;
+	c = 3;
+}
+print(var) -- Prints "2"
+```
+
 ## API
 |Method|Description|
 |---|---|
