@@ -1,7 +1,7 @@
 -- TODO: Add instance switches
 TestSwitch = {
 
-	testSimple = function ()
+	testStatement = function ()
 		local var
 		switch (2) {
 			[1] = function ()
@@ -34,12 +34,28 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, "c")
 	end;
 
-	testSwitchAsExpression = function ()
+	testExpression = function ()
 		local var = switch "b" {
 			a = 1;
 			b = 2;
 			c = 3;
 		}
 		LuaUnit.assertEquals(var, 2)
+	end;
+
+	testInstanceAsKey = function ()
+		local objA = A()
+		local objB = B()
+		local val = objB
+		local var
+		switch (val) {
+			[objA] = function ()
+				var = "A"
+			end;
+			[objB] = function ()
+				var = "B"
+			end;
+		}
+		LuaUnit.assertEquals(var, "B")
 	end;
 }
