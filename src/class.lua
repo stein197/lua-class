@@ -58,11 +58,32 @@ function Util.createClass(descriptor)
 			if descriptor.constructor then
 				descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
 			end
-			object.__meta = {}
+			object.__meta = {
+				type = Type.INSTANCE
+			}
 			return object
 		end
 	})
 	Util.__lastTypeName = nil
+end
+
+function Util.getTypeName(entityType)
+	return switch (entityType) {
+		[Type.CLASS] = "class";
+		[Type.TRAIT] = "trait";
+	}
+end
+
+function Util.checkTypeName(entityType, name)
+	if not Util.Naming.isValid(name) then
+		error("Cannot declare "..Util.getTypeName(entityType)..". Name \""..name.."\" contains invalid characters")
+	end
+end
+
+function Util.checkTypeExistance(entityType, name)
+	if Util.findType(name) then
+		error("Cannot declare "..Util.getTypeName(entityType)..". Variable with name \""..name.."\" already exists")
+	end
 end
 
 function Util.Naming.isValid(identifier, includedots)
@@ -110,12 +131,8 @@ Object = {
 }
 
 function class(name)
-	if not Util.Naming.isValid(name) then
-		error("Cannot declare class. Classname \""..name.."\" contains invalid characters")
-	end
-	if Util.findType(name) then
-		error("Cannot declare class. Variable or class with name \""..name.."\" already exists")
-	end
+	Util.checkTypeName(Type.CLASS, name)
+	Util.checkTypeExistance(Type.CLASS, name)
 	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
 	local classref = _G[name]
 	Util.__lastTypeName = name
@@ -137,7 +154,7 @@ function switch(variable)
 	return function (map)
 		for case, value in pairs(map) do
 			local matches = false
-			if type(case) == "table" and not case.__meta then
+			if type(case) == "table" and (not case.__meta or case.__meta.type ~= Type.INSTANCE) then
 				for k, v in pairs(case) do
 					if v == variable then
 						matches = true
@@ -157,6 +174,21 @@ function switch(variable)
 		end
 	end
 end
+
+function trait(name)
+	Util.checkTypeName(Type.TRAIT, name)
+	Util.checkTypeExistance(Type.TRAIT, name)
+	return function (descriptor)
+		descriptor.__meta = {
+			name = name;
+			type = Type.TRAIT;
+		}
+		_G[name] = descriptor
+	end
+end
+
+-- TODO
+function uses(...) end
 
 class "Class" {
 
@@ -186,5 +218,9 @@ class "Class" {
 
 	getName = function (self)
 		return self:getMeta("name")
+	end;
+
+	getTraits = function (self)
+		return self:getMeta("traits")
 	end;
 }
