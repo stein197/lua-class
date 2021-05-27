@@ -23,6 +23,58 @@ function table.slice(tbl, from, to)
 	return sliced
 end
 
+local Type = {
+	CLASS = 0;
+	INSTANCE = 1;
+	TRAIT = 2;
+}
+
+local Util = {
+	Naming = {}
+}
+
+function Util.findType(name)
+	local nameType = type(name)
+	local ref
+	if nameType == "string" then
+		ref = _G[name]
+	elseif nameType == "table" then
+		ref = name
+	else
+		error("Classname \""..name.."\" is not a string nor a table")
+	end
+	if not ref or not ref.__meta then
+		return nil
+	end
+	return ref
+end
+
+function Util.createClass(descriptor)
+	local className = Util.__lastTypeName
+	_G[className] = setmetatable(descriptor, {
+		__index = _G[className];
+		__call = function (...)
+			local object = setmetatable({}, {__index = descriptor})
+			if descriptor.constructor then
+				descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
+			end
+			object.__meta = {}
+			return object
+		end
+	})
+	Util.__lastTypeName = nil
+end
+
+function Util.Naming.isValid(identifier, includedots)
+	local pattern
+	if includedots then
+		pattern = "^[a-zA-Z][a-zA-Z0-9%.]*$"
+	else
+		pattern = "^[a-zA-Z][a-zA-Z0-9]*$"
+	end
+	return identifier:match(pattern)
+end
+
 Object = {
 
 	__meta = {
@@ -33,7 +85,7 @@ Object = {
 		if not classname then
 			error "Supplied argument is nil"
 		end
-		local ref = ClassUtil.findType(classname)
+		local ref = Util.findType(classname)
 		if not ref then
 			if type(classname) == "string" then
 				error("Cannot find class \""..classname.."\"")
@@ -57,78 +109,28 @@ Object = {
 	end;
 }
 
-ClassUtil = {
-
-	__lastTypeName = nil;
-
-	findType = function (name)
-		local nameType = type(name)
-		local ref
-		if nameType == "string" then
-			ref = _G[name]
-		elseif nameType == "table" then
-			ref = name
-		else
-			error("Classname \""..name.."\" is not a string nor a table")
-		end
-		if not ref or not ref.__meta then
-			return nil
-		end
-		return ref
-	end;
-	
-	createClass = function (descriptor)
-		local className = ClassUtil.__lastTypeName
-		_G[className] = setmetatable(descriptor, {
-			__index = _G[className];
-			__call = function (...)
-				local object = setmetatable({}, {__index = descriptor})
-				if descriptor.constructor then
-					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
-				end
-				object.__meta = {}
-				return object
-			end
-		})
-		ClassUtil.__lastTypeName = nil
-	end;
-
-	Naming = {
-
-		isValid = function (identifier, includedots)
-			local pattern
-			if includedots then
-				pattern = "^[a-zA-Z][a-zA-Z0-9%.]*$"
-			else
-				pattern = "^[a-zA-Z][a-zA-Z0-9]*$"
-			end
-			return identifier:match(pattern)
-		end;
-	};
-}
-
 function class(name)
-	if not ClassUtil.Naming.isValid(name) then
+	if not Util.Naming.isValid(name) then
 		error("Cannot declare class. Classname \""..name.."\" contains invalid characters")
 	end
-	if ClassUtil.findType(name) then
+	if Util.findType(name) then
 		error("Cannot declare class. Variable or class with name \""..name.."\" already exists")
 	end
 	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
 	local classref = _G[name]
-	ClassUtil.__lastTypeName = name
-	return ClassUtil.createClass
+	Util.__lastTypeName = name
+	return Util.createClass
 end
 
 function extends(className)
-	local parentClass = ClassUtil.findType(className)
+	local parentClass = Util.findType(className)
 	if not parentClass then
 		error("Cannot find class \""..className.."\"")
 	end
-	local currentClass = _G[ClassUtil.__lastTypeName]
+	local currentClass = _G[Util.__lastTypeName]
 	currentClass.__meta.parent = parentClass
-	_G[ClassUtil.__lastTypeName] = setmetatable(currentClass, {__index = parentClass})
-	return ClassUtil.createClass
+	_G[Util.__lastTypeName] = setmetatable(currentClass, {__index = parentClass})
+	return Util.createClass
 end
 
 function switch(variable)
@@ -164,7 +166,7 @@ class "Class" {
 		if not ref then
 			error("Class reference cannot be nil")
 		end
-		self.ref = ClassUtil.findType(ref)
+		self.ref = Util.findType(ref)
 		if not self.ref then
 			error("Cannot find class \""..ref.."\"")
 		end
