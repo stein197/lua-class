@@ -29,38 +29,49 @@ Type = {
 	CLASS = 1;
 	TRAIT = 2;
 
+	__last = nil;
+
 	find = function (name)
 		local nameType = type(name)
-		local ref
+		if nameType ~= "string" and not (nameType == "table" and name.__meta) then
+			error "Only strings or direct references are allowed as the only argument"
+		end
 		if nameType == "string" then
-			ref = _G[name]
-		elseif nameType == "table" then
-			ref = name
+			return _G[name]
 		else
-			error("Classname \""..name.."\" is not a string nor a table")
+			return name
 		end
-		if not ref or not ref.__meta then
-			return nil
-		end
-		return ref
 	end;
 
-	create = function (descriptor)
-		local className = Util.__lastTypeName
-		_G[className] = setmetatable(descriptor, {
-			__index = _G[className];
-			__call = function (...)
-				local object = setmetatable({}, {__index = descriptor})
-				if descriptor.constructor then
-					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
-				end
-				object.__meta = {
-					type = Type.INSTANCE
-				}
-				return object
-			end
-		})
-		Util.__lastTypeName = nil
+	descriptorHandler = function (descriptor)
+		local meta = Type.__last.__meta
+		switch (meta.type) {
+			[Type.CLASS] = function ()
+				_G[meta.name] = setmetatable(descriptor, {
+					__index = _G[meta.name];
+					__call = function (...)
+						local object = setmetatable({}, {
+							__index = descriptor
+						})
+						if descriptor.constructor then
+							descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
+						end
+						object.__meta = {
+							type = Type.INSTANCE
+						}
+						return object
+					end
+				})
+			end;
+			[Type.TRAIT] = function ()
+			end;
+		}
+		Type.__last = nil
+	end;
+
+	deleteLast = function ()
+		_G[Type.__last.__meta.name] = nil
+		Type.__last = nil
 	end;
 
 	getNameFromEnum = function (value)
@@ -96,7 +107,7 @@ Object = {
 		if not classname then
 			error "Supplied argument is nil"
 		end
-		local ref = Util.findType(classname)
+		local ref = Type.find(classname)
 		if not ref then
 			if type(classname) == "string" then
 				error("Cannot find class \""..classname.."\"")
@@ -121,23 +132,33 @@ Object = {
 }
 
 function class(name)
-	Util.checkTypeName(Type.CLASS, name)
-	Util.checkTypeExistance(Type.CLASS, name)
-	_G[name] = setmetatable({__meta = {name = name}}, {__index = Object})
-	local classref = _G[name]
-	Util.__lastTypeName = name
-	return Util.createClass
+	Type.Check.name(Type.CLASS, name)
+	Type.Check.absence(Type.CLASS, name)
+	local ref = setmetatable({
+		__meta = {
+			name = name;
+			type = Type.CLASS
+		}
+	}, {
+		__index = Object
+	})
+	_G[name] = ref
+	Type.__last = ref
+	return Type.descriptorHandler
 end
 
 function extends(className)
-	local parentClass = Util.findType(className)
-	if not parentClass then
+	local parent = Type.find(className)
+	if not parent then
 		error("Cannot find class \""..className.."\"")
+		Type.deleteLast()
 	end
-	local currentClass = _G[Util.__lastTypeName]
-	currentClass.__meta.parent = parentClass
-	_G[Util.__lastTypeName] = setmetatable(currentClass, {__index = parentClass})
-	return Util.createClass
+	local currentClass = Type.__last
+	currentClass.__meta.parent = parent
+	_G[Type.__last.__meta.name] = setmetatable(currentClass, {
+		__index = parent
+	})
+	return Type.descriptorHandler
 end
 
 function switch(variable)
@@ -166,8 +187,8 @@ function switch(variable)
 end
 
 function trait(name)
-	Util.checkTypeName(Type.TRAIT, name)
-	Util.checkTypeExistance(Type.TRAIT, name)
+	Type.Check.name(Type.TRAIT, name)
+	Type.Check.absence(Type.TRAIT, name)
 	return function (descriptor)
 		descriptor.__meta = {
 			name = name;
@@ -188,7 +209,7 @@ class "Class" {
 		if not ref then
 			error("Class reference cannot be nil")
 		end
-		self.ref = Util.findType(ref)
+		self.ref = Type.find(ref)
 		if not self.ref then
 			error("Cannot find class \""..ref.."\"")
 		end

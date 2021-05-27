@@ -47,6 +47,7 @@ TestInheritance = {
 	testInstanceof = function ()
 		LuaUnit.assertTrue(C():instanceof(C))
 		LuaUnit.assertTrue(C():instanceof "C")
+		LuaUnit.assertTrue(C():instanceof "B")
 		LuaUnit.assertTrue(ChildOverrideConstructor():instanceof(ChildOverrideConstructor))
 	end;
 
