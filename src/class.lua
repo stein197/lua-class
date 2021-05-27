@@ -23,78 +23,68 @@ function table.slice(tbl, from, to)
 	return sliced
 end
 
-local Type = {
-	CLASS = 0;
-	INSTANCE = 1;
+Type = {
+
+	INSTANCE = 0;
+	CLASS = 1;
 	TRAIT = 2;
-}
 
-local Util = {
-	Naming = {}
-}
-
-function Util.findType(name)
-	local nameType = type(name)
-	local ref
-	if nameType == "string" then
-		ref = _G[name]
-	elseif nameType == "table" then
-		ref = name
-	else
-		error("Classname \""..name.."\" is not a string nor a table")
-	end
-	if not ref or not ref.__meta then
-		return nil
-	end
-	return ref
-end
-
-function Util.createClass(descriptor)
-	local className = Util.__lastTypeName
-	_G[className] = setmetatable(descriptor, {
-		__index = _G[className];
-		__call = function (...)
-			local object = setmetatable({}, {__index = descriptor})
-			if descriptor.constructor then
-				descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
-			end
-			object.__meta = {
-				type = Type.INSTANCE
-			}
-			return object
+	find = function (name)
+		local nameType = type(name)
+		local ref
+		if nameType == "string" then
+			ref = _G[name]
+		elseif nameType == "table" then
+			ref = name
+		else
+			error("Classname \""..name.."\" is not a string nor a table")
 		end
-	})
-	Util.__lastTypeName = nil
-end
+		if not ref or not ref.__meta then
+			return nil
+		end
+		return ref
+	end;
 
-function Util.getTypeName(entityType)
-	return switch (entityType) {
-		[Type.CLASS] = "class";
-		[Type.TRAIT] = "trait";
+	create = function (descriptor)
+		local className = Util.__lastTypeName
+		_G[className] = setmetatable(descriptor, {
+			__index = _G[className];
+			__call = function (...)
+				local object = setmetatable({}, {__index = descriptor})
+				if descriptor.constructor then
+					descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
+				end
+				object.__meta = {
+					type = Type.INSTANCE
+				}
+				return object
+			end
+		})
+		Util.__lastTypeName = nil
+	end;
+
+	getNameFromEnum = function (value)
+		return switch (entityType) {
+			[Type.CLASS] = "class";
+			[Type.TRAIT] = "trait";
+		}
+	end;
+
+	Check = {
+
+		name = function (entityType, name)
+			if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
+				error("Cannot declare "..Util.getNameFromEnum(entityType)..". Name \""..name.."\" contains invalid characters")
+			end
+		end;
+
+		absence = function (entityType, name)
+			if Type.find(name) then
+				error("Cannot declare "..Util.getNameFromEnum(entityType)..". Variable with name \""..name.."\" already exists")
+			end
+		end;
 	}
-end
-
-function Util.checkTypeName(entityType, name)
-	if not Util.Naming.isValid(name) then
-		error("Cannot declare "..Util.getTypeName(entityType)..". Name \""..name.."\" contains invalid characters")
-	end
-end
-
-function Util.checkTypeExistance(entityType, name)
-	if Util.findType(name) then
-		error("Cannot declare "..Util.getTypeName(entityType)..". Variable with name \""..name.."\" already exists")
-	end
-end
-
-function Util.Naming.isValid(identifier, includedots)
-	local pattern
-	if includedots then
-		pattern = "^[a-zA-Z][a-zA-Z0-9%.]*$"
-	else
-		pattern = "^[a-zA-Z][a-zA-Z0-9]*$"
-	end
-	return identifier:match(pattern)
-end
+}
 
 Object = {
 

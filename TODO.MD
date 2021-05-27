@@ -17,3 +17,4 @@
 - [ ] Add `this` via `setfenv()` and make it reference to instance;
 - [ ] Add `super` keyword via `setfenv()`;
 - [ ] Add fallback for switch;
+- [ ] Remove types when creation error occures;
