@@ -18,3 +18,4 @@
 - [ ] Add `super` keyword via `setfenv()`;
 - [ ] Add fallback for switch;
 - [ ] Remove types when creation error occures;
+- [ ] Add ability to call methods from inside constructor;

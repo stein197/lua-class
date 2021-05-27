@@ -1,38 +1,68 @@
 TestClass = {
+
+	setupClass = function ()
+		class "A" {
+			field = 0;
+			constructor = function (self, f)
+				self.field = f
+				self:method()
+			end;
+			method = function ()
+				return self.field
+			end;
+		}
+	end;
+
+	teardownClass = function ()
+		_G['A'] = nil
+	end;
+
 	testExistence = function ()
 		LuaUnit.assertTable(A)
-		LuaUnit.assertTable(B)
 		LuaUnit.assertNil(NotExistingClass)
 	end;
+
+	testConstructor = function ()
+		LuaUnit.assertZero(A().field)
+		LuaUnit.assertNil(A(nil).field)
+		LuaUnit.assertEquals(A(10).field, 10)
+	end;
+
 	testInstantiating = function ()
 		LuaUnit.assertTable(A())
 		LuaUnit.assertTable(B())
 	end;
+
 	testConstructor = function ()
 		local var = Constructor(2, 3)
 		LuaUnit.assertEquals(var.a, 2)
 		LuaUnit.assertEquals(var.b, 3)
 	end;
+
 	testConstructorCreatesDifferentInstances = function ()
 		local a = Constructor(2, 3)
 		local b = Constructor(5, 7)
 		LuaUnit.assertFalse(a.a == b.a)
 		LuaUnit.assertFalse(a.b == b.b)
 	end;
+
 	testMethodIsCorrect = function ()
 		local a = Constructor(2, 3)
 		local b = Constructor(5, 7)
 		LuaUnit.assertEquals(a:getSum(), 5)
 		LuaUnit.assertEquals(b:getSum(), 12)
 	end;
+
 	testInstantiaingNotModifyingClass = function ()
 		Constructor(2, 3)
 		LuaUnit.assertNil(Constructor.a)
 	end;
+
 	testClassesInGlobal = function ()
 		LuaUnit.assertEquals(_G['A'], A)
 		LuaUnit.assertEquals(_G['Constructor'], Constructor)
 	end;
+
 	testInstanceof = function ()
 		local a = A()
 		local b = B()
@@ -51,12 +81,14 @@ TestClass = {
 		LuaUnit.assertTrue(a:instanceof(a:getClass()))
 		LuaUnit.assertTrue(b:instanceof(b:getClass()))
 	end;
+
 	testGetClass = function ()
 		local a = A()
 		local b = B()
 		LuaUnit.assertEquals(a:getClass(), A)
 		LuaUnit.assertEquals(b:getClass(), B)
 	end;
+
 	testClassRedeclareThrowsError = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot declare class. Variable or class with name \"A\" already exists",
@@ -65,6 +97,7 @@ TestClass = {
 			end
 		)
 	end;
+
 	testClassInvalidNameThrowsError = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot declare class. Classname \"invalid name\" contains invalid characters",
@@ -79,12 +112,14 @@ TestClass = {
 			end
 		)
 	end;
+
 	testGetMetaOnClass = function ()
 		LuaUnit.assertEquals(Class(A):getMeta(), {name = "A"})
 		LuaUnit.assertEquals(Class(Constructor):getMeta().name, "Constructor")
 		LuaUnit.assertEquals(Class(Object):getMeta().name, "Object")
 		LuaUnit.assertEquals(Class(B():getClass()):getMeta().name, "B")
 	end;
+
 	testInstanceContainsDefaultProperties = function ()
 		LuaUnit.assertEquals(DefaultProperties().a, 2)
 		LuaUnit.assertEquals(DefaultProperties().b, 3)
