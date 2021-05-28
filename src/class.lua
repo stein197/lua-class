@@ -51,7 +51,7 @@ Type = {
 					__index = _G[meta.name];
 					__call = function (...)
 						local object = setmetatable({}, {
-							__index = descriptor
+							__index = _G[meta.name]
 						})
 						if descriptor.constructor then
 							descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
@@ -75,7 +75,7 @@ Type = {
 	end;
 
 	getNameFromEnum = function (value)
-		return switch (entityType) {
+		return switch (value) {
 			[Type.CLASS] = "class";
 			[Type.TRAIT] = "trait";
 		}
@@ -85,13 +85,13 @@ Type = {
 
 		name = function (entityType, name)
 			if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
-				error("Cannot declare "..Util.getNameFromEnum(entityType)..". Name \""..name.."\" contains invalid characters")
+				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Name \""..name.."\" contains invalid characters")
 			end
 		end;
 
 		absence = function (entityType, name)
 			if Type.find(name) then
-				error("Cannot declare "..Util.getNameFromEnum(entityType)..". Variable with name \""..name.."\" already exists")
+				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Variable with name \""..name.."\" already exists")
 			end
 		end;
 	}
@@ -158,6 +158,10 @@ function extends(className)
 	_G[Type.__last.__meta.name] = setmetatable(currentClass, {
 		__index = parent
 	})
+	if not parent.__meta.children then
+		parent.__meta.children = {}
+	end
+	table.insert(parent.__meta.children, Type.__last)
 	return Type.descriptorHandler
 end
 
@@ -229,6 +233,10 @@ class "Class" {
 
 	getName = function (self)
 		return self:getMeta("name")
+	end;
+
+	getChildren = function (self)
+		return self:getMeta("children")
 	end;
 
 	getTraits = function (self)
