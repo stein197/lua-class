@@ -47,9 +47,7 @@ Type = {
 		local meta = Type.__last.__meta
 		switch (meta.type) {
 			[Type.CLASS] = function ()
-				-- local lastClass = _G[meta.name]
 				_G[meta.name] = setmetatable(descriptor, {
-					-- __index = lastClass;
 					__index = _G[meta.name];
 					__call = function (...)
 						local object = setmetatable({}, {
@@ -64,7 +62,17 @@ Type = {
 						return object
 					end
 				})
-				_G[meta.name].__meta.parent.__meta.children[meta.name] = _G[meta.name]
+				local ref = _G[meta.name]
+				ref.__meta.parent.__meta.children[meta.name] = ref
+				if ref.__meta.traits then
+					for i, traitRef in pairs(ref.__meta.traits) do
+						for mName, m in pairs(traitRef) do
+							if not ref[mName] then
+								ref[mName] = m
+							end
+						end
+					end
+				end
 			end;
 			[Type.TRAIT] = function ()
 			end;
@@ -156,8 +164,8 @@ end
 function extends(className)
 	local parent = Type.find(className)
 	if not parent then
-		error("Cannot find class \""..className.."\"")
 		Type.deleteLast()
+		error("Cannot find class \""..className.."\"")
 	end
 	local lastType = Type.__last
 	lastType.__meta.parent = parent
@@ -200,15 +208,37 @@ function trait(name)
 	Type.Check.absence(Type.TRAIT, name)
 	return function (descriptor)
 		descriptor.__meta = {
-			name = name;
-			type = Type.TRAIT;
+			name = name,
+			type = Type.TRAIT
 		}
 		_G[name] = descriptor
 	end
 end
 
 -- TODO
-function uses(...) end
+function uses(...)
+	local traitList = {...}
+	local lastType = Type.__last
+	local lastTypeMeta = lastType.__meta
+	if lastTypeMeta.type ~= Type.CLASS then
+		Type.deleteLast()
+		error("\""..lastTypeMeta.name.."\" is not a class. Only classes can use traits")
+	end
+	lastTypeMeta.traits = {}
+	for i, ref in pairs(traitList) do
+		local foundRef = Type.find(ref)
+		if not foundRef then
+			Type.deleteLast()
+			error("Cannot find trait at index "..i)
+		end
+		if foundRef.__meta.type ~= Type.TRAIT then
+			Type.deleteLast()
+			error("\""..foundRef.__meta.name.."\" is not a trait")
+		end
+		lastTypeMeta.traits[foundRef.__meta.name] = foundRef
+	end
+	return Type.descriptorHandler
+end
 
 class "Class" {
 
