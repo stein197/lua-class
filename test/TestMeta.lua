@@ -16,6 +16,15 @@ TestMeta = {
 
 	test_getMeta_returnsTable = function ()
 		LuaUnit.assertTable(Class(ExampleA):getMeta())
+		LuaUnit.assertEquals(Class(ExampleA):getMeta(), {
+			name = "ExampleA",
+			type = Type.CLASS,
+			parent = Object,
+			children = {
+				ExampleB0 = ExampleB0,
+				ExampleB1 = ExampleB1,
+			}
+		})
 	end;
 
 	test_getMeta_withKey_returnsValue = function ()
