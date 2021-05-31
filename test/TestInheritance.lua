@@ -1,6 +1,37 @@
 TestInheritance = {
 
-	testExtendingNotExistingClassThrowsError = function ()
+	setupClass = function ()
+		-- class "A" {
+		-- 	field = 0;
+		-- 	constructor = function (self, f)
+		-- 		self.field = f
+		-- 	end;
+		-- 	method = function (self)
+		-- 		return self.field
+		-- 	end;
+		-- }
+		-- class "B0" extends "A" {}
+		-- class "B1" extends "A" {
+		-- 	method = function (self)
+		-- 		return "B1"
+		-- 	end
+		-- }
+		-- class "B2" extends "A" {
+		-- 	field = 2;
+		-- 	constructor = function (self, f)
+		-- 		self.field = f ^ 2
+		-- 	end
+		-- }
+	end;
+
+	teardownClass = function ()
+		_G["A"] = nil
+		_G["B0"] = nil
+		_G["B1"] = nil
+		_G["B2"] = nil
+	end;
+
+	test_extendingNotExistingClassThrowsError = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot find class \"NotDefined\"",
 			function ()
@@ -9,61 +40,39 @@ TestInheritance = {
 		)
 	end;
 
-	testClassInheritsConstructor = function ()
-		local child = ConstructorChild(2, 3)
-		LuaUnit.assertEquals(child.a, 2)
-		LuaUnit.assertEquals(child.b, 3)
+	test_classInheritsConstructor = function ()
+		LuaUnit.assertEquals(B0(2).field, 2)
 	end;
 
-	testClassInheritsMethods = function ()
-		LuaUnit.assertEquals(C():method2(), "method 2")
+	test_classInheritsMethods = function ()
+		LuaUnit.assertEquals(B0():method(), 0)
 	end;
 
-	testClassInheritsProperties = function ()
-		LuaUnit.assertEquals(ChildDefaultProperties().a, 2)
-		LuaUnit.assertEquals(ChildDefaultProperties().b, 3)
+	test_classInheritsProperties = function ()
+		LuaUnit.assertEquals(B0().field, 0)
+		LuaUnit.assertEquals(B1().field, 0)
 	end;
 
-	testClassOverridesConstructor = function ()
-		LuaUnit.assertEquals(ChildOverrideConstructor().a, 0)
-		LuaUnit.assertEquals(ChildOverrideConstructor().b, 0)
+	-- test_сlassOverridesConstructor = function ()
+	-- 	LuaUnit.assertEquals(B2(4).field, 16)
+	-- end;
+
+	test_classOverridesMethods = function ()
+		LuaUnit.assertEquals(B1():method(), "B1")
 	end;
 
-	testClassOverridesMethods = function ()
-		LuaUnit.assertEquals(C():method1(), "overrided")
+	test_classOverridesProperties = function ()
+		LuaUnit.assertEquals(B2().field, 2)
 	end;
 
-	testClassOverridesProperties = function ()
-		LuaUnit.assertEquals(ChildOverrideDefaultProperties().a, "a")
-		LuaUnit.assertEquals(ChildOverrideDefaultProperties().b, "b")
+	test_instanceof = function ()
+		LuaUnit.assertTrue(B0():instanceof(B0))
+		LuaUnit.assertTrue(B0():instanceof "B0")
+		LuaUnit.assertTrue(B2():instanceof "A")
+		LuaUnit.assertTrue(B3():instanceof(Object))
 	end;
 
-	testMetaContainsParentReference = function ()
-		LuaUnit.assertEquals(Class(Class(C):getMeta().parent):getMeta("name"), "B")
-		LuaUnit.assertEquals(Class(C):getMeta("parent"), B)
-		LuaUnit.assertEquals(Class(Class(C):getMeta("parent")):getMeta().name, "B")
-	end;
-
-	testInstanceof = function ()
-		LuaUnit.assertTrue(C():instanceof(C))
-		LuaUnit.assertTrue(C():instanceof "C")
-		LuaUnit.assertTrue(C():instanceof "B")
-		LuaUnit.assertTrue(ChildOverrideConstructor():instanceof(ChildOverrideConstructor))
-	end;
-
-	testInstanceofDerived = function ()
-		LuaUnit.assertTrue(C():instanceof(B))
-		LuaUnit.assertTrue(C():instanceof(Object))
-		LuaUnit.assertTrue(C():instanceof "B")
-		LuaUnit.assertTrue(C():instanceof "Object")
-		LuaUnit.assertTrue(ChildOverrideConstructor():instanceof(Constructor))
-		LuaUnit.assertTrue(ChildOverrideConstructor():instanceof "Constructor")
-		LuaUnit.assertTrue(ChildOverrideConstructor():instanceof(Object))
-		LuaUnit.assertTrue(ChildOverrideConstructor():instanceof "Object")
-	end;
-
-	testGetClass = function ()
-		LuaUnit.assertEquals(C():getClass(), C)
-		LuaUnit.assertEquals(ChildOverrideConstructor():getClass(), ChildOverrideConstructor)
+	test_getClass = function ()
+		LuaUnit.assertEquals(B0():getClass(), B0)
 	end;
 }

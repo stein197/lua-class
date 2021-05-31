@@ -1,5 +1,14 @@
--- TODO: Add instance switches
 TestSwitch = {
+
+	setupClass = function ()
+		class "ExampleA" {}
+		class "ExampleB" {}
+	end;
+
+	teardownClass = function ()
+		_G['ExampleA'] = nil
+		_G['ExampleB'] = nil
+	end;
 
 	testStatement = function ()
 		local var
@@ -44,8 +53,8 @@ TestSwitch = {
 	end;
 
 	testInstanceAsKey = function ()
-		local objA = A()
-		local objB = B()
+		local objA = ExampleA()
+		local objB = ExampleB()
 		local val = objB
 		local var
 		switch (val) {

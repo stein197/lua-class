@@ -47,7 +47,9 @@ Type = {
 		local meta = Type.__last.__meta
 		switch (meta.type) {
 			[Type.CLASS] = function ()
+				-- local lastClass = _G[meta.name]
 				_G[meta.name] = setmetatable(descriptor, {
+					-- __index = lastClass;
 					__index = _G[meta.name];
 					__call = function (...)
 						local object = setmetatable({}, {
@@ -62,6 +64,7 @@ Type = {
 						return object
 					end
 				})
+				_G[meta.name].__meta.parent.__meta.children[meta.name] = _G[meta.name]
 			end;
 			[Type.TRAIT] = function ()
 			end;
@@ -100,7 +103,9 @@ Type = {
 Object = {
 
 	__meta = {
-		name = "Object"
+		name = "Object";
+		type = Type.CLASS;
+		children = {};
 	};
 
 	instanceof = function (self, classname)
@@ -137,7 +142,8 @@ function class(name)
 	local ref = setmetatable({
 		__meta = {
 			name = name;
-			type = Type.CLASS
+			type = Type.CLASS;
+			parent = Object;
 		}
 	}, {
 		__index = Object
@@ -153,15 +159,14 @@ function extends(className)
 		error("Cannot find class \""..className.."\"")
 		Type.deleteLast()
 	end
-	local currentClass = Type.__last
-	currentClass.__meta.parent = parent
-	_G[Type.__last.__meta.name] = setmetatable(currentClass, {
+	local lastType = Type.__last
+	lastType.__meta.parent = parent
+	_G[lastType.__meta.name] = setmetatable(lastType, {
 		__index = parent
 	})
 	if not parent.__meta.children then
 		parent.__meta.children = {}
 	end
-	table.insert(parent.__meta.children, Type.__last)
 	return Type.descriptorHandler
 end
 
