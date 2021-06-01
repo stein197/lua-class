@@ -78,8 +78,8 @@ Type = {
 				descriptor.__meta = meta
 				_G[meta.name] = descriptor
 				if meta.traits then
-					for i, t in pairs(meta.traits) do
-						for m, mName in pairs(t) do
+					for tName, t in pairs(meta.traits) do
+						for mName, m in pairs(t) do
 							if not descriptor[mName] then
 								descriptor[mName] = m
 							end
