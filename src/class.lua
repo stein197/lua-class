@@ -74,13 +74,15 @@ Type = {
 					end
 				end
 			end;
-			[Type.TRAIT] = function (descriptor)
+			[Type.TRAIT] = function ()
 				descriptor.__meta = meta
 				_G[meta.name] = descriptor
-				for i, t in pairs(meta.traits) do
-					for m, mName in pairs(t) do
-						if not descriptor[mName] then
-							descriptor[mName] = m
+				if meta.traits then
+					for i, t in pairs(meta.traits) do
+						for m, mName in pairs(t) do
+							if not descriptor[mName] then
+								descriptor[mName] = m
+							end
 						end
 					end
 				end
