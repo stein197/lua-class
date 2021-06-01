@@ -1,4 +1,8 @@
 # CHANGELOG
+## 1.5.0
+### Features
+- Added traits support
+- Added `default` case in switch statement
 ## 1.4.0
 ### Features
 - Added `switch` function statement

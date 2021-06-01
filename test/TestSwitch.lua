@@ -67,4 +67,20 @@ TestSwitch = {
 		}
 		LuaUnit.assertEquals(var, "B")
 	end;
+
+	test_defaultBranch = function ()
+		local var
+		switch ("c") {
+			a = function ()
+				var = "a"
+			end;
+			b = function ()
+				var = "b"
+			end;
+			[default] = function ()
+				var = "c"
+			end;
+		}
+		LuaUnit.assertEquals(var, "c")
+	end;
 }

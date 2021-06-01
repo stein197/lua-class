@@ -74,7 +74,7 @@ TestTrait = {
 
 	test_cannotRedeclareTrait = function ()
 		LuaUnit.assertErrorMsgContains(
-			"Cannot declare trait. Variable with name \"TraitA\" already exists"
+			"Cannot declare trait. Variable with name \"TraitA\" already exists",
 			function ()
 				trait "TraitA" {}
 			end
