@@ -81,10 +81,10 @@ TestTrait = {
 		)
 	end;
 
-	test_traitsCannotExtendOtherTypes = function () end;
-	test_examplesCannotUseNotTraits = function () end;
-	test_allExamplesContainDerivedTraitMethods = function () end;
-	test_traitsDoNotOverrideClassMethods = function () end;
-	test_gettingExampleMeta = function () end;
-	test_gettingTraitMeta = function () end;
+	-- test_traitsCannotExtendOtherTypes = function () end;
+	-- test_examplesCannotUseNotTraits = function () end;
+	-- test_allExamplesContainDerivedTraitMethods = function () end;
+	-- test_traitsDoNotOverrideClassMethods = function () end;
+	-- test_gettingExampleMeta = function () end;
+	-- test_gettingTraitMeta = function () end;
 }
