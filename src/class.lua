@@ -331,6 +331,25 @@ class "Class" extends 'TypeBase' {
 	getTraits = function (self)
 		return self:getMeta("traits")
 	end;
+
+	uses = function (self, ...)
+		local tList = {...}
+		local classTraitList = self:getTraits()
+		for i, t in pairs(tList) do
+			local tRef = Type.find(t)
+			local matches = false
+			for tName, classTrait in pairs(classTraitList) do 
+				if tRef == classTrait then
+					matches = true
+					break
+				end
+			end
+			if not matches then
+				return false
+			end
+		end
+		return true
+	end
 }
 
 class "Trait" extends 'TypeBase' {
@@ -345,8 +364,8 @@ class "Trait" extends 'TypeBase' {
 		end
 	end;
 
-	getParent = function (self)
-		return self:getMeta("parent")
+	getTraits = function (self)
+		return self:getMeta("traits")
 	end;
 
 	getChildren = function (self)
