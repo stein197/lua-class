@@ -6,16 +6,16 @@
 - [ ] Add interfaces and implements keyword;
 - [ ] Add try-catch-throw;
 - [ ] Add import keyword;
-- [ ] Add traits;
+- [x] Add traits;
 - [ ] Add inner classes (via lastclassname as table instead of string);
 - [ ] Add `clone()` method;
 - [x] Optionally add an ability to get class name;
 - [ ] Add static fields;
 - [ ] Use reflection - debug and debug.getInfo, __index for _G, setfenv and etc.;
-- [ ] Remove method injection duplication `function *.getMeta()` and try to use a reference to class table (may be through `debug`);
 - [ ] Remove `self` first argument via `setfenv()` and make it reference to class;
 - [ ] Add `this` via `setfenv()` and make it reference to instance;
 - [ ] Add `super` keyword via `setfenv()`;
-- [ ] Add fallback for switch;
-- [ ] Remove types when creation error occures;
+- [x] Add fallback for switch;
+- [x] Remove types when creation error occures;
 - [ ] Add ability to call methods from inside constructor;
+- [ ] Add `permits` keyword to seal types

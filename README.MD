@@ -61,8 +61,11 @@ switch (var) {
 	[1] = 2; -- Or numeric one
 	[Object()] = 3; -- Or even class instances
 	[{"b", "c"}] = function () -- Use multiple values. Mostly functions will be used as code block
-		print("Switch!") -- Prints "Switch!"
+		print "Switch!" -- Prints "Switch!"
 	end;
+	[default] = function () -- Use default fallback
+		var = 12
+	end
 }
 -- Or even use it as expression
 local var = switch "b" {
@@ -85,3 +88,4 @@ There is also special Class API. This package defines own class `Class` which ca
 |`Class():getMeta()`|Returns metainfo about class as a table. The returned table contains fields `name`, `parent`|
 |`Class():getName()`|Same as `Class():getMeta("name")`|
 |`Class():getParent()`|Same as `Class():getMeta("parent")`|
+

@@ -44,11 +44,20 @@ Type = {
 	end;
 
 	descriptorHandler = function (descriptor)
-		local meta = Type.__last.__meta
+		local last = Type.__last
+		local meta = last.__meta
 		switch (meta.type) {
 			[Type.CLASS] = function ()
-				_G[meta.name] = setmetatable(descriptor, {
-					__index = _G[meta.name];
+				-- TODO: Проверить что реально работает
+				if meta.traits then
+					for tName, t in pairs(meta.traits) do
+						last = setmetatable(last, {
+							__index = t
+						})
+					end
+				end
+				last = setmetatable(descriptor, {
+					__index = last;
 					__call = function (...)
 						local object = setmetatable({}, {
 							__index = _G[meta.name]
@@ -62,30 +71,21 @@ Type = {
 						return object
 					end
 				})
-				local ref = _G[meta.name]
-				ref.__meta.parent.__meta.children[meta.name] = ref
-				if ref.__meta.traits then
-					for i, traitRef in pairs(ref.__meta.traits) do
-						for mName, m in pairs(traitRef) do
-							if not ref[mName] then
-								ref[mName] = m
-							end
-						end
-					end
+				if last.__meta.parent then
+					last.__meta.parent.__meta.children[meta.name] = last
 				end
+				_G[meta.name] = last
 			end;
 			[Type.TRAIT] = function ()
-				descriptor.__meta = meta
-				_G[meta.name] = descriptor
-				if meta.traits then
-					for tName, t in pairs(meta.traits) do
-						for mName, m in pairs(t) do
-							if not descriptor[mName] then
-								descriptor[mName] = m
-							end
-						end
+				last = setmetatable(descriptor, {
+					__index = last
+				})
+				if last.__meta.traits then
+					for i, parent in pairs(last.__meta.traits) do
+						parent.__meta.children[last.__meta.name] = last
 					end
 				end
+				_G[meta.name] = last
 			end;
 		}
 		Type.__last = nil
@@ -186,11 +186,15 @@ function trait(name)
 	return Type.descriptorHandler
 end
 
+-- TODO: Merge switch branches, use an array of single element for class
 function extends(...)
 	local lastType = Type.__last
 	local typeList = {...}
 	switch (lastType.__meta.type) {
 		[Type.CLASS] = function ()
+			if #typeList > 1 then
+				warn("Classes can extend only single class")
+			end
 			local className = typeList[1]
 			local parent = Type.find(className)
 			if not parent then
@@ -210,23 +214,31 @@ function extends(...)
 			end
 		end;
 		[Type.TRAIT] = function ()
-			local tList = typeList
 			lastType.__meta.traits = {}
-			for i, t in pairs(tList) do
-				local ref = Type.find(t)
-				if not ref then
+			for i, t in pairs(typeList) do
+				local parent = Type.find(t)
+				if not parent then
 					Type.deleteLast()
 					error("Cannot find trait \""..t.."\"")
 				end
-				if ref.__meta.type ~= Type.TRAIT then
+				if parent.__meta.type ~= Type.TRAIT then
 					Type.deleteLast()
-					error("Trait cannot extend "..Type.getNameFromEnum(ref.__meta.name).." \""..t.."\"")
+					error("Trait cannot extend "..Type.getNameFromEnum(parent.__meta.name).." \""..t.."\"")
 				end
-				lastType.__meta.traits[ref.__meta.name] = ref
-				if not ref.__meta.children then
-					ref.__meta.children = {}
+				if not parent.__meta.children then
+					parent.__meta.children = {}
 				end
+				lastType.__meta.traits[parent.__meta.name] = parent
 			end
+			setmetatable(Type.__last, {
+				__index = function (self, key)
+					for tName, t in pairs(self.__meta.traits) do
+						if t[key] then
+							return t[key]
+						end
+					end
+				end;
+			})
 		end;
 	}
 	return Type.descriptorHandler
