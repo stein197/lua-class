@@ -11,57 +11,58 @@ TestClass = {
 			end;
 		}
 		class "ExampleB" {}
-		class "CallFromConstructor" {
-			constructor = function (self)
-				self:method()
+		class "ExampleC" {
+			field = nil;
+			constructor = function (self, value)
+				self:method(value)
 			end;
-			method = function () end;
+			method = function (self, value)
+				self.field = value
+			end;
 		}
 	end;
 
 	teardownClass = function ()
 		_G["ExampleA"] = nil
 		_G["ExampleB"] = nil
-		_G["CallFromConstructor"] = nil
+		_G["ExampleC"] = nil
 	end;
 
-	testExistence = function ()
+	test_existence = function ()
 		LuaUnit.assertTable(ExampleA)
 		LuaUnit.assertNil(NotExistingClass)
 	end;
 
-	testConstructor = function ()
+	test_constructor = function ()
 		LuaUnit.assertEquals(ExampleA().field, 0)
 		LuaUnit.assertEquals(ExampleA(10).field, 10)
 	end;
 
-	testInstantiating = function ()
-		LuaUnit.assertTable(ExampleA())
-	end;
-
-	testConstructorCreatesDifferentInstances = function ()
+	test_constructorCreatesDifferentInstances = function ()
 		local a = ExampleA(2)
 		local b = ExampleA(5)
+		LuaUnit.assertEquals(a.field, 2)
+		LuaUnit.assertEquals(b.field, 5)
 		LuaUnit.assertFalse(a.field == b.field)
 	end;
 
-	testConstructorCallMethod = function ()
-		CallFromConstructor()
+	test_constructorCallsMethod = function ()
+		LuaUnit.assertEquals(ExampleC(2).field, 2)
 	end;
 
-	testMethod = function ()
+	test_method = function ()
 		local a = ExampleA(2)
 		local b = ExampleA(5)
 		LuaUnit.assertEquals(a:method(), 2)
 		LuaUnit.assertEquals(b:method(), 5)
 	end;
 
-	testClassesAreGlobal = function ()
+	test_classesAreGlobal = function ()
 		LuaUnit.assertEquals(_G['ExampleA'], ExampleA)
-		LuaUnit.assertEquals(_G['CallFromConstructor'], CallFromConstructor)
+		LuaUnit.assertEquals(_G['ExampleC'], ExampleC)
 	end;
 
-	testInstanceof = function ()
+	test_instanceof = function ()
 		local a = ExampleA()
 		local b = ExampleB()
 		LuaUnit.assertTrue(a:instanceof "ExampleA")
@@ -80,14 +81,14 @@ TestClass = {
 		LuaUnit.assertTrue(b:instanceof(b:getClass()))
 	end;
 
-	testGetClass = function ()
+	test_getClass = function ()
 		local a = ExampleA()
 		local b = ExampleB()
 		LuaUnit.assertEquals(a:getClass(), ExampleA)
 		LuaUnit.assertEquals(b:getClass(), ExampleB)
 	end;
 
-	testClassRedeclareThrowsError = function ()
+	test_classRedeclareThrowsError = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot declare class. Variable with name \"ExampleA\" already exists",
 			function ()
@@ -96,7 +97,7 @@ TestClass = {
 		)
 	end;
 
-	testClassInvalidNameThrowsError = function ()
+	test_classInvalidNameThrowsError = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot declare class. Name \"invalid name\" contains invalid characters",
 			function ()
