@@ -28,17 +28,17 @@ TestClass = {
 		_G["ExampleC"] = nil
 	end;
 
-	test_existence = function ()
+	["test: Classes exist"] = function ()
 		LuaUnit.assertTable(ExampleA)
 		LuaUnit.assertNil(NotExistingClass)
 	end;
 
-	test_constructor = function ()
+	["test: Constructor behaves correct"] = function ()
 		LuaUnit.assertEquals(ExampleA().field, 0)
 		LuaUnit.assertEquals(ExampleA(10).field, 10)
 	end;
 
-	test_constructorCreatesDifferentInstances = function ()
+	["test: Constructor creates different instances"] = function ()
 		local a = ExampleA(2)
 		local b = ExampleA(5)
 		LuaUnit.assertEquals(a.field, 2)
@@ -46,23 +46,23 @@ TestClass = {
 		LuaUnit.assertFalse(a.field == b.field)
 	end;
 
-	test_constructorCallsMethod = function ()
+	["test: Methods can be called from inside constructor"] = function ()
 		LuaUnit.assertEquals(ExampleC(2).field, 2)
 	end;
 
-	test_method = function ()
+	["test: Method calls are correct"] = function ()
 		local a = ExampleA(2)
 		local b = ExampleA(5)
 		LuaUnit.assertEquals(a:method(), 2)
 		LuaUnit.assertEquals(b:method(), 5)
 	end;
 
-	test_classesAreGlobal = function ()
+	["test: Classes are stored in global scope"] = function ()
 		LuaUnit.assertEquals(_G['ExampleA'], ExampleA)
 		LuaUnit.assertEquals(_G['ExampleC'], ExampleC)
 	end;
 
-	test_instanceof = function ()
+	["test: instanceof()"] = function ()
 		local a = ExampleA()
 		local b = ExampleB()
 		LuaUnit.assertTrue(a:instanceof "ExampleA")
@@ -81,14 +81,14 @@ TestClass = {
 		LuaUnit.assertTrue(b:instanceof(b:getClass()))
 	end;
 
-	test_getClass = function ()
+	["test: getClass()"] = function ()
 		local a = ExampleA()
 		local b = ExampleB()
 		LuaUnit.assertEquals(a:getClass(), ExampleA)
 		LuaUnit.assertEquals(b:getClass(), ExampleB)
 	end;
 
-	test_classRedeclareThrowsError = function ()
+	["test: Class redeclaration raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot declare class. Variable with name \"ExampleA\" already exists",
 			function ()
@@ -97,7 +97,7 @@ TestClass = {
 		)
 	end;
 
-	test_classInvalidNameThrowsError = function ()
+	["test: Class with invalid characters raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot declare class. Name \"invalid name\" contains invalid characters",
 			function ()
@@ -110,5 +110,29 @@ TestClass = {
 				class "0numeric0" {}
 			end
 		)
+	end;
+
+	["test: \"__meta\" field declaration throws error"] = function ()
+		LuaUnit.assertErrorMsgContains(
+			"Declaration of field \"__meta\" is not allowed",
+			function ()
+				class "MetaField" {
+					__meta = {}
+				}
+			end
+		)
+	end;
+
+	["test: Classes won't be created after declaration errors"] = function ()
+		pcall(function ()
+			class "Error1: Invalid name" {}
+		end)
+		pcall(function ()
+			class "Error2" {
+				__meta = 12
+			}
+		end)
+		LuaUnit.assertNil(_G["Error1: Invalid name"])
+		LuaUnit.assertNil(_G["Error2"])
 	end;
 }
