@@ -88,4 +88,5 @@ TestTrait = {
 	test_gettingExampleMeta = function () end;
 	test_gettingTraitMeta = function () end;
 	test_classUses = function () end;
+	-- test Class():uses(), getTraits...
 }

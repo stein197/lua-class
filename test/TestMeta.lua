@@ -14,7 +14,7 @@ TestMeta = {
 		_G["ExampleC"] = nil
 	end;
 
-	test_getMeta_returnsTable = function ()
+	["test: getMeta() returns table"] = function ()
 		LuaUnit.assertTable(Class(ExampleA):getMeta())
 		LuaUnit.assertEquals(Class(ExampleA):getMeta(), {
 			name = "ExampleA",

@@ -3,6 +3,7 @@
 ### Features
 - Added traits support
 - Added `default` case in switch statement
+- Added `null` function in case of using null values in tables
 ## 1.4.0
 ### Features
 - Added `switch` function statement

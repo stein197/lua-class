@@ -44,6 +44,7 @@ Type = {
 	end;
 
 	descriptorHandler = function (descriptor)
+		Type.Check.metaAbsence(descriptor)
 		local last = Type.__last
 		local meta = last.__meta
 		switch (meta.type) {
@@ -114,6 +115,13 @@ Type = {
 		absence = function (entityType, name)
 			if Type.find(name) then
 				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Variable with name \""..name.."\" already exists") -- TODO: Add type of variable
+			end
+		end;
+
+		metaAbsence = function (descriptor)
+			if descriptor.__meta then
+				Type.deleteLast()
+				error "Declaration of field \"__meta\" is not allowed"
 			end
 		end;
 	}
@@ -225,6 +233,7 @@ function extends(...)
 					Type.deleteLast()
 					error("Trait cannot extend "..Type.getNameFromEnum(parent.__meta.name).." \""..t.."\"")
 				end
+				-- TODO: Если возникнет ошибка, то ссылки в parent не удалятся
 				if not parent.__meta.children then
 					parent.__meta.children = {}
 				end
@@ -302,6 +311,7 @@ function switch(variable)
 end
 
 function default() end
+function null() end
 
 class 'TypeBase' {
 
