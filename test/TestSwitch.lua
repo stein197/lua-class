@@ -10,7 +10,7 @@ TestSwitch = {
 		_G['ExampleB'] = nil
 	end;
 
-	testStatement = function ()
+	test_statement = function ()
 		local var
 		switch (2) {
 			[1] = function ()
@@ -26,7 +26,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, 2)
 	end;
 
-	testMultipleSwitch = function ()
+	test_multiple = function ()
 		local var
 		local val = "c"
 		switch (val) {
@@ -43,7 +43,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, "c")
 	end;
 
-	testExpression = function ()
+	test_expression = function ()
 		local var = switch "b" {
 			a = 1;
 			b = 2;
@@ -52,7 +52,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, 2)
 	end;
 
-	testInstanceAsKey = function ()
+	test_instance = function ()
 		local objA = ExampleA()
 		local objB = ExampleB()
 		local val = objB
@@ -68,7 +68,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, "B")
 	end;
 
-	test_defaultBranch = function ()
+	test_default = function ()
 		local var
 		switch ("c") {
 			a = function ()
@@ -82,5 +82,15 @@ TestSwitch = {
 			end;
 		}
 		LuaUnit.assertEquals(var, "c")
+	end;
+
+	test_notMatch = function ()
+		local var = 0
+		switch ("d") {
+			a = function ()
+				var = "a"
+			end;
+		}
+		LuaUnit.assertEquals(var, 0)
 	end;
 }
