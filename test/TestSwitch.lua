@@ -10,7 +10,7 @@ TestSwitch = {
 		_G['ExampleB'] = nil
 	end;
 
-	test_statement = function ()
+	["test: Statement"] = function ()
 		local var
 		switch (2) {
 			[1] = function ()
@@ -26,7 +26,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, 2)
 	end;
 
-	test_multiple = function ()
+	["test: Multiple case list"] = function ()
 		local var
 		local val = "c"
 		switch (val) {
@@ -43,7 +43,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, "c")
 	end;
 
-	test_expression = function ()
+	["test: Expression"] = function ()
 		local var = switch "b" {
 			a = 1;
 			b = 2;
@@ -52,7 +52,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, 2)
 	end;
 
-	test_instance = function ()
+	["test: Use class instances as case keys"] = function ()
 		local objA = ExampleA()
 		local objB = ExampleB()
 		local val = objB
@@ -68,7 +68,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, "B")
 	end;
 
-	test_default = function ()
+	["test: Default branch"] = function ()
 		local var
 		switch ("c") {
 			a = function ()
@@ -84,7 +84,7 @@ TestSwitch = {
 		LuaUnit.assertEquals(var, "c")
 	end;
 
-	test_notMatch = function ()
+	["test: Not matching any branch"] = function ()
 		local var = 0
 		switch ("d") {
 			a = function ()
