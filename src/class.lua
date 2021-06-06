@@ -37,10 +37,35 @@ local function concatSentenceList(...)
 	return table.concat(sentenceList, ". ")
 end
 
+local function checkTypeName(entityType, name)
+	if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
+		error(concatSentenceList(getDeclarationMessageError(entityType, name), "The name contains invalid characters"))
+	end
+end
+
+local function checkTypeAbsence(entityType, name)
+	local foundType = Type.find(name)
+	if foundType then
+		local errMsg = getDeclarationMessageError(entityType, name)
+		if type(foundType) == "table" and foundType.__meta and foundType.__meta.type then
+			error(concatSentenceList(errMsg, Type.getNameFromEnum(foundType.__meta.type).." with this name already exists"))
+		else
+			error(concatSentenceList(errMsg, "Global variable with this name already exists"))
+		end
+	end
+end
+
+local function checkTypeMetaAbsence(entityType, name, descriptor)
+	if descriptor.__meta then
+		Type.deleteLast()
+		error(concatSentenceList(getDeclarationMessageError(entityType, name), "Declaration of field \"__meta\" is not allowed"))
+	end
+end
+
 local function typeDecriptorHandler(descriptor)
 	local last = Type.__last
 	local meta = last.__meta
-	Type.Check.metaAbsence(meta.type, meta.name, descriptor)
+	checkTypeMetaAbsence(meta.type, meta.name, descriptor)
 	last = setmetatable(descriptor, {
 		__index = last;
 		__call = function (...)
@@ -67,7 +92,6 @@ Type = {
 
 	INSTANCE = 0;
 	CLASS = 1;
-	TRAIT = 2;
 
 	__last = nil;
 
@@ -87,7 +111,6 @@ Type = {
 		return switch (value) {
 			[Type.INSTANCE] = "instance";
 			[Type.CLASS] = "class";
-			[Type.TRAIT] = "trait";
 		}
 	end;
 
@@ -117,41 +140,6 @@ Type = {
 		Type.delete(Type.__last)
 		Type.__last = nil
 	end;
-
-	Check = {
-
-		name = function (entityType, name)
-			if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
-				error(concatSentenceList(getDeclarationMessageError(entityType, name), "The name contains invalid characters"))
-			end
-		end;
-
-		absence = function (entityType, name)
-			local foundType = Type.find(name)
-			if foundType then
-				local errMsg = getDeclarationMessageError(entityType, name)
-				if type(foundType) == "table" and foundType.__meta and foundType.__meta.type then
-					error(concatSentenceList(errMsg, Type.getNameFromEnum(foundType.__meta.type).." with this name already exists"))
-				else
-					error(concatSentenceList(errMsg, "Global variable with this name already exists"))
-				end
-			end
-		end;
-
-		metaAbsence = function (entityType, name, descriptor)
-			if descriptor.__meta then
-				Type.deleteLast()
-				error(concatSentenceList(getDeclarationMessageError(entityType, name), "Declaration of field \"__meta\" is not allowed"))
-			end
-		end;
-
-		extending = function (entityType, name, baseList)
-			if entityType == Type.CLASS and #baseList > 1 then
-				Type.deleteLast()
-				error(concatSentenceList(getDeclarationMessageError(entityType, name), "Classes can extend only single class"))
-			end
-		end;
-	}
 }
 
 Object = {
@@ -191,8 +179,8 @@ Object = {
 }
 
 function class(name)
-	Type.Check.name(Type.CLASS, name)
-	Type.Check.absence(Type.CLASS, name)
+	checkTypeName(Type.CLASS, name)
+	checkTypeAbsence(Type.CLASS, name)
 	local ref = setmetatable({
 		__meta = {
 			name = name;
@@ -210,7 +198,6 @@ end
 function extends(...)
 	local lastType = Type.__last
 	local typeList = {...}
-	Type.Check.extending(Type.CLASS, lastType.__meta.name, typeList)
 	local className = typeList[1]
 	local parent = Type.find(className)
 	if not parent then

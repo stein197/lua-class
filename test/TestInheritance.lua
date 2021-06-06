@@ -219,22 +219,6 @@ TestInheritance = {
 		})
 	end;
 
-	["test: Deriving from multiple classes raises error"] = function ()
-		LuaUnit.assertErrorMsgContains(
-			"Cannot declare class \"ExampleError\". Classes can extend only single class",
-			function ()
-				class "ExampleError" extends (Object, ExampleA) {}
-			end
-		)
-	end;
-
-	["test: Class won't be created after deriving from multiple classes"] = function ()
-		pcall(function ()
-			class "ExampleError" extends (Object, ExampleA) {}
-		end)
-		LuaUnit.assertNil(NotExampleErrorExisting)
-	end;
-
 	["test: Extending undefined class raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(
 			"Cannot find class \"NotDefined\"",
