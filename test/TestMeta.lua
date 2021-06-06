@@ -24,21 +24,22 @@ TestMeta = {
 		})
 	end;
 
-	test_getMeta_withKey_returnsValue = function ()
+	["test: getMeta(<key>) returns single entry"] = function ()
 		LuaUnit.assertEquals(Class(ExampleB0):getMeta("name"), "ExampleB0")
+		LuaUnit.assertEquals(Class(ExampleB0):getMeta("parent"), ExampleA)
 	end;
 
-	test_getParent_isCorrect = function ()
+	["test: getParent() is correct"] = function ()
 		LuaUnit.assertNil(Class(Object):getParent())
 		LuaUnit.assertEquals(Class(ExampleA):getParent(), Object)
 		LuaUnit.assertEquals(Class(ExampleB1):getParent(), ExampleA)
 	end;
 
-	test_getName_isCorrect = function ()
+	["test: getName() is correct"] = function ()
 		LuaUnit.assertEquals(Class(ExampleC):getName(), "ExampleC")
 	end;
 
-	test_getChildren_isCorrect = function ()
+	["test: getChildren() is correct"] = function ()
 		LuaUnit.assertEquals(Class(ExampleA):getChildren(), {
 			ExampleB0 = ExampleB0;
 			ExampleB1 = ExampleB1;
@@ -48,7 +49,4 @@ TestMeta = {
 		})
 		LuaUnit.assertNil(Class(ExampleC):getChildren())
 	end;
-
-	-- TODO
-	-- test_getTraits_isCorrect = function () end;
 }
