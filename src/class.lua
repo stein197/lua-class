@@ -114,7 +114,7 @@ Type = {
 	end;
 
 	deleteLast = function ()
-		_G[Type.__last.__meta.name] = nil
+		Type.delete(Type.__last)
 		Type.__last = nil
 	end;
 
