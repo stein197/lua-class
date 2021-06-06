@@ -93,7 +93,7 @@ TestClass = {
 
 	["test: Class redeclaration raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(
-			"Cannot declare class. Variable with name \"ExampleA\" already exists",
+			"Cannot declare class \"ExampleA\". Class with this name already exists",
 			function ()
 				class "ExampleA" {}
 			end
@@ -102,13 +102,13 @@ TestClass = {
 
 	["test: Class with invalid characters raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(
-			"Cannot declare class. Name \"invalid name\" contains invalid characters",
+			"Cannot declare class \"invalid name\". The name contains invalid characters",
 			function ()
 				class "invalid name" {}
 			end
 		)
 		LuaUnit.assertErrorMsgContains(
-			"Cannot declare class. Name \"0numeric0\" contains invalid characters",
+			"Cannot declare class \"0numeric0\". The name contains invalid characters",
 			function ()
 				class "0numeric0" {}
 			end
@@ -117,7 +117,7 @@ TestClass = {
 
 	["test: \"__meta\" field declaration throws error"] = function ()
 		LuaUnit.assertErrorMsgContains(
-			"Declaration of field \"__meta\" is not allowed",
+			"Cannot declare class \"MetaField\". Declaration of field \"__meta\" is not allowed",
 			function ()
 				class "MetaField" {
 					__meta = {}

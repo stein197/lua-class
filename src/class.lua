@@ -23,6 +23,69 @@ function table.slice(tbl, from, to)
 	return sliced
 end
 
+local function getDeclarationMessageError(entityType, name)
+	return "Cannot declare "..Type.getNameFromEnum(entityType).." \""..name.."\""
+end
+
+local function concatSentenceList(...)
+	local sentenceList = {...}
+	for i, sentence in pairs(sentenceList) do
+		sentenceList[i] = sentence:gsub("^%s*([a-z])", function (fChar)
+			return fChar:upper()
+		end)
+	end
+	return table.concat(sentenceList, ". ")
+end
+
+local function typeDecriptorHandler(descriptor)
+	local last = Type.__last
+	local meta = last.__meta
+	Type.Check.metaAbsence(meta.type, meta.name, descriptor)
+	switch (meta.type) {
+		[Type.CLASS] = function ()
+			-- TODO: Проверить что реально работает
+			if meta.traits then
+				for tName, t in pairs(meta.traits) do
+					last = setmetatable(last, {
+						__index = t
+					})
+				end
+			end
+			last = setmetatable(descriptor, {
+				__index = last;
+				__call = function (...)
+					local object = setmetatable({}, {
+						__index = _G[meta.name]
+					})
+					if descriptor.constructor then
+						descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
+					end
+					object.__meta = {
+						type = Type.INSTANCE
+					}
+					return object
+				end
+			})
+			if last.__meta.parent then
+				last.__meta.parent.__meta.children[meta.name] = last
+			end
+			_G[meta.name] = last
+		end;
+		[Type.TRAIT] = function ()
+			last = setmetatable(descriptor, {
+				__index = last
+			})
+			if last.__meta.traits then
+				for i, parent in pairs(last.__meta.traits) do
+					parent.__meta.children[last.__meta.name] = last
+				end
+			end
+			_G[meta.name] = last
+		end;
+	}
+	Type.__last = nil
+end
+
 Type = {
 
 	INSTANCE = 0;
@@ -43,92 +106,56 @@ Type = {
 		end
 	end;
 
-	descriptorHandler = function (descriptor)
-		local last = Type.__last
-		local meta = last.__meta
-		Type.Check.metaAbsence(meta.type, descriptor)
-		switch (meta.type) {
-			[Type.CLASS] = function ()
-				-- TODO: Проверить что реально работает
-				if meta.traits then
-					for tName, t in pairs(meta.traits) do
-						last = setmetatable(last, {
-							__index = t
-						})
-					end
-				end
-				last = setmetatable(descriptor, {
-					__index = last;
-					__call = function (...)
-						local object = setmetatable({}, {
-							__index = _G[meta.name]
-						})
-						if descriptor.constructor then
-							descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
-						end
-						object.__meta = {
-							type = Type.INSTANCE
-						}
-						return object
-					end
-				})
-				if last.__meta.parent then
-					last.__meta.parent.__meta.children[meta.name] = last
-				end
-				_G[meta.name] = last
-			end;
-			[Type.TRAIT] = function ()
-				last = setmetatable(descriptor, {
-					__index = last
-				})
-				if last.__meta.traits then
-					for i, parent in pairs(last.__meta.traits) do
-						parent.__meta.children[last.__meta.name] = last
-					end
-				end
-				_G[meta.name] = last
-			end;
+	-- local Type.getNameFromEnum
+	getNameFromEnum = function (value)
+	-- local function Type.getNameFromEnum(value)
+		return switch (value) {
+			[Type.INSTANCE] = "instance";
+			[Type.CLASS] = "class";
+			[Type.TRAIT] = "trait";
 		}
-		Type.__last = nil
 	end;
+
+	-- descriptorHandler = function (descriptor)
+
+	-- end;
 
 	deleteLast = function ()
 		_G[Type.__last.__meta.name] = nil
 		Type.__last = nil
 	end;
 
-	getNameFromEnum = function (value)
-		return switch (value) {
-			[Type.CLASS] = "class";
-			[Type.TRAIT] = "trait";
-		}
-	end;
-
 	Check = {
 
 		name = function (entityType, name)
 			if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
-				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Name \""..name.."\" contains invalid characters")
+				error(concatSentenceList(getDeclarationMessageError(entityType, name), "The name contains invalid characters"))
 			end
 		end;
 
 		absence = function (entityType, name)
-			if Type.find(name) then
-				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Variable with name \""..name.."\" already exists") -- TODO: Add type of variable
+			local foundType = Type.find(name)
+			if foundType then
+				local errMsg = getDeclarationMessageError(entityType, name)
+				if type(foundType) == "table" and foundType.__meta and foundType.__meta.type then
+					error(concatSentenceList(errMsg, Type.getNameFromEnum(foundType.__meta.type).." with this name already exists"))
+				else
+					error(concatSentenceList(errMsg, "Global variable with this name already exists"))
+				end
 			end
 		end;
 
-		metaAbsence = function (entityType, descriptor)
+		metaAbsence = function (entityType, name, descriptor)
 			if descriptor.__meta then
 				Type.deleteLast()
-				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Declaration of field \"__meta\" is not allowed")
+				error(concatSentenceList(getDeclarationMessageError(entityType, name), "Declaration of field \"__meta\" is not allowed"))
 			end
 		end;
 
 		extending = function (entityType, name, baseList)
 			if entityType == Type.CLASS and #baseList > 1 then
 				Type.deleteLast()
-				error("Cannot declare "..(Type.getNameFromEnum(entityType)).." \""..name.."\". Classes can extend only single class")
+				error(concatSentenceList(getDeclarationMessageError(entityType, name), "Classes can extend only single class"))
 			end
 		end;
 	}
@@ -184,7 +211,7 @@ function class(name)
 	})
 	_G[name] = ref
 	Type.__last = ref
-	return Type.descriptorHandler
+	return typeDecriptorHandler
 end
 
 function trait(name)
@@ -198,7 +225,7 @@ function trait(name)
 	}
 	_G[name] = ref
 	Type.__last = ref
-	return Type.descriptorHandler
+	return typeDecriptorHandler
 end
 
 -- TODO: Merge switch branches, use an array of single element for class
@@ -255,7 +282,7 @@ function extends(...)
 			})
 		end;
 	}
-	return Type.descriptorHandler
+	return typeDecriptorHandler
 end
 
 function uses(...)
@@ -279,7 +306,7 @@ function uses(...)
 		end
 		lastTypeMeta.traits[foundRef.__meta.name] = foundRef
 	end
-	return Type.descriptorHandler
+	return typeDecriptorHandler
 end
 
 function switch(variable)
