@@ -23,6 +23,13 @@ function table.slice(tbl, from, to)
 	return sliced
 end
 
+local __lastType = nil
+
+local function deleteLastType()
+	Type.delete(__lastType)
+	__lastType = nil
+end
+
 local function getDeclarationMessageError(entityType, name)
 	return "Cannot declare "..Type.getNameFromEnum(entityType).." \""..name.."\""
 end
@@ -57,13 +64,13 @@ end
 
 local function checkTypeMetaAbsence(entityType, name, descriptor)
 	if descriptor.__meta then
-		Type.deleteLast()
+		deleteLastType()
 		error(concatSentenceList(getDeclarationMessageError(entityType, name), "Declaration of field \"__meta\" is not allowed"))
 	end
 end
 
 local function typeDecriptorHandler(descriptor)
-	local last = Type.__last
+	local last = __lastType
 	local meta = last.__meta
 	checkTypeMetaAbsence(meta.type, meta.name, descriptor)
 	last = setmetatable(descriptor, {
@@ -85,15 +92,13 @@ local function typeDecriptorHandler(descriptor)
 		last.__meta.parent.__meta.children[meta.name] = last
 	end
 	_G[meta.name] = last
-	Type.__last = nil
+	__lastType = nil
 end
 
 Type = {
 
 	INSTANCE = 0;
 	CLASS = 1;
-
-	__last = nil;
 
 	find = function (name)
 		local nameType = type(name)
@@ -134,11 +139,6 @@ Type = {
 			end
 		end
 		_G[typeName] = nil
-	end;
-
-	deleteLast = function ()
-		Type.delete(Type.__last)
-		Type.__last = nil
 	end;
 }
 
@@ -191,21 +191,21 @@ function class(name)
 		__index = Object
 	})
 	_G[name] = ref
-	Type.__last = ref
+	__lastType = ref
 	return typeDecriptorHandler
 end
 
 function extends(...)
-	local lastType = Type.__last
+	local lastType = __lastType
 	local typeList = {...}
 	local className = typeList[1]
 	local parent = Type.find(className)
 	if not parent then
-		Type.deleteLast()
+		deleteLastType()
 		error("Cannot find class \""..className.."\"")
 	end
 	if parent.__meta.type ~= Type.CLASS then
-		Type.deleteLast()
+		deleteLastType()
 		error("Class cannot extend "..Type.getNameFromEnum(parent.__meta.type).." \""..className.."\"")
 	end
 	lastType.__meta.parent = parent
