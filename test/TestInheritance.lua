@@ -69,7 +69,11 @@ TestInheritance = {
 			end;
 		}
 		class "ExampleD0" extends "ExampleC0" {}
-		class "ExampleD1" extends "ExampleC1" {}
+		class "ExampleD1" extends "ExampleC1" {
+			getField2 = function (self)
+				return "ExampleD1:"..self.field2
+			end;
+		}
 	end;
 
 	teardownClass = function ()
@@ -82,9 +86,10 @@ TestInheritance = {
 		_G["ExampleC2"] = nil
 		_G["ExampleD0"] = nil
 		_G["ExampleD1"] = nil
+		Object.__meta.children.ExampleA = nil
 	end;
 
-	["test: Derived class inherits methods"] = function ()
+	["test: Derived class inherits methods & properties"] = function ()
 		LuaUnit.assertEquals(ExampleB0():getField1(), 10)
 		LuaUnit.assertEquals(ExampleB0():getField2(), "a")
 		LuaUnit.assertEquals(ExampleB0(1):getField1(), 1)
@@ -92,7 +97,7 @@ TestInheritance = {
 		LuaUnit.assertEquals(ExampleB2():getField2(), "a")
 	end;
 
-	["test: Derived class overrides methods"] = function ()
+	["test: Derived class overrides methods & properties"] = function ()
 		LuaUnit.assertEquals(ExampleB1():getField1(), "ExampleB1:20")
 		LuaUnit.assertEquals(ExampleB1():getField2(), "ExampleB1:b")
 		LuaUnit.assertEquals(ExampleB1(2, "b"):getField1(), "ExampleB1:40")
@@ -100,30 +105,144 @@ TestInheritance = {
 		LuaUnit.assertEquals(ExampleB2():getField1(), "ExampleB2:25")
 	end;
 
-	["test: Deep class chain inherits methods"] = function ()
+	["test: Deep class chain inherits methods & properties"] = function ()
 		LuaUnit.assertEquals(ExampleC0():getField1(), 10)
 		LuaUnit.assertEquals(ExampleC0():getField2(), "a")
 		LuaUnit.assertEquals(ExampleC0(15, "A"):getField1(), 15)
 		LuaUnit.assertEquals(ExampleC0(15, "A"):getField2(), "A")
+		LuaUnit.assertEquals(ExampleD0():getField1(), 10)
 	end;
-	["test: Deep class chain overrides methods"] = function () end; -- TODO
-	["test: Derived class inhertits properties"] = function () end; -- TODO
-	["test: Derived class overrides properties"] = function () end; -- TODO
-	["test: Deep class chain inherits properties"] = function () end; -- TODO
-	["test: Deep class chain overrides properties"] = function () end; -- TODO
-	["test: Derived class inhertits constructor"] = function () end; -- TODO
-	["test: Derived class overrides constructor"] = function () end; -- TODO
-	["test: Deep class chain inherits constructor"] = function () end; -- TODO
-	["test: Deep class chain overrides constructor"] = function () end; -- TODO
-	["test: \"__meta\" field always overrides"] = function () end; -- TODO
-	["test: instanceof() returns true for every class in chain"] = function () end; -- TODO
-	["test: getClass() returns derived class"] = function () end; -- TODO
-	["test: getMeta(\"parent\") == getParent()"] = function () end; -- TODO
-	["test: getMeta(\"children\") == getChildren()"] = function () end; -- TODO
-	["test: getParent() on Object is nil"] = function () end; -- TODO
-	["test: getChildren() on Object contains all \"base\" classes"] = function () end; -- TODO
-	["test: Deriving from multiple classes raises error"] = function () end; -- TODO
-	["test: Class won't be created after deriving from multiple classes"] = function () end; -- TODO
+
+	["test: Deep class chain overrides methods & properties"] = function ()
+		LuaUnit.assertEquals(ExampleC1():getField1(), "ExampleC1:30")
+		LuaUnit.assertEquals(ExampleC1(35):getField1(), "ExampleC1:1050")
+		LuaUnit.assertEquals(ExampleC1().field2, "c")
+		LuaUnit.assertEquals(ExampleD1():getField2(), "ExampleD1:c")
+	end;
+
+	["test: \"__meta\" field always overrides"] = function ()
+		LuaUnit.assertEquals(ExampleB0.__meta, {
+			name = "ExampleB0",
+			parent = ExampleA,
+			type = Type.CLASS,
+			children = {
+				ExampleC0 = ExampleC0
+			}
+		})
+		LuaUnit.assertEquals(ExampleD1.__meta, {
+			name = "ExampleD1",
+			parent = ExampleC1,
+			type = Type.CLASS,
+		})
+	end;
+
+	["test: Instance \"__meta\" field is not equal to class ones"] = function ()
+		LuaUnit.assertNotEquals(ExampleA().__meta, ExampleA.__meta)
+		LuaUnit.assertNotEquals(ExampleC1().__meta, ExampleC1.__meta)
+	end;
+
+	["test: instanceof(<string>) returns true for every class in chain"] = function ()
+		LuaUnit.assertTrue(ExampleA():instanceof "ExampleA")
+		LuaUnit.assertTrue(ExampleA():instanceof "Object")
+
+		LuaUnit.assertTrue(ExampleB0():instanceof "ExampleB0")
+		LuaUnit.assertTrue(ExampleB0():instanceof "ExampleA")
+		LuaUnit.assertTrue(ExampleB0():instanceof "Object")
+
+		LuaUnit.assertTrue(ExampleC0():instanceof "ExampleC0")
+		LuaUnit.assertTrue(ExampleC0():instanceof "ExampleB0")
+		LuaUnit.assertTrue(ExampleC0():instanceof "ExampleA")
+		LuaUnit.assertTrue(ExampleC0():instanceof "Object")
+
+		LuaUnit.assertTrue(ExampleD1():instanceof "ExampleD1")
+		LuaUnit.assertTrue(ExampleD1():instanceof "ExampleC1")
+		LuaUnit.assertTrue(ExampleD1():instanceof "ExampleB1")
+		LuaUnit.assertTrue(ExampleD1():instanceof "ExampleA")
+		LuaUnit.assertTrue(ExampleD1():instanceof "Object")
+	end;
+
+	["test: instanceof(<ref>) returns true for every class in chain"] = function ()
+		LuaUnit.assertTrue(ExampleA():instanceof(ExampleA))
+		LuaUnit.assertTrue(ExampleA():instanceof(Object))
+
+		LuaUnit.assertTrue(ExampleB0():instanceof(ExampleB0))
+		LuaUnit.assertTrue(ExampleB0():instanceof(ExampleA))
+		LuaUnit.assertTrue(ExampleB0():instanceof(Object))
+
+		LuaUnit.assertTrue(ExampleC0():instanceof(ExampleC0))
+		LuaUnit.assertTrue(ExampleC0():instanceof(ExampleB0))
+		LuaUnit.assertTrue(ExampleC0():instanceof(ExampleA))
+		LuaUnit.assertTrue(ExampleC0():instanceof(Object))
+
+		LuaUnit.assertTrue(ExampleD1():instanceof(ExampleD1))
+		LuaUnit.assertTrue(ExampleD1():instanceof(ExampleC1))
+		LuaUnit.assertTrue(ExampleD1():instanceof(ExampleB1))
+		LuaUnit.assertTrue(ExampleD1():instanceof(ExampleA))
+		LuaUnit.assertTrue(ExampleD1():instanceof(Object))
+	end;
+
+	["test: getClass() returns derived class"] = function ()
+		LuaUnit.assertEquals(ExampleB0():getClass(), ExampleB0)
+		LuaUnit.assertEquals(ExampleC0():getClass(), ExampleC0)
+		LuaUnit.assertEquals(ExampleD0():getClass(), ExampleD0)
+		LuaUnit.assertEquals(ExampleD1():getClass(), ExampleD1)
+	end;
+
+	["test: getMeta(\"parent\") == getParent()"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getParent(), Class(ExampleA):getMeta("parent"))
+		LuaUnit.assertEquals(Class(ExampleC1):getParent(), Class(ExampleC1):getMeta("parent"))
+		LuaUnit.assertEquals(Class(ExampleD0):getParent(), Class(ExampleD0):getMeta("parent"))
+	end;
+
+	["test: getParent() returns extended class"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getParent(), Object)
+		LuaUnit.assertEquals(Class(ExampleB0):getParent(), ExampleA)
+		LuaUnit.assertEquals(Class(ExampleC0):getParent(), ExampleB0)
+		LuaUnit.assertEquals(Class(ExampleD1):getParent(), ExampleC1)
+	end;
+
+	["test: getMeta(\"children\") == getChildren()"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getChildren(), Class(ExampleA):getMeta("children"))
+		LuaUnit.assertEquals(Class(ExampleB0):getChildren(), Class(ExampleB0):getMeta("children"))
+	end;
+
+	["test: getChildren() returns all child classes"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getChildren(), {
+			ExampleB0 = ExampleB0,
+			ExampleB1 = ExampleB1,
+			ExampleB2 = ExampleB2
+		})
+		LuaUnit.assertEquals(Class(ExampleB1):getChildren(), {
+			ExampleC1 = ExampleC1,
+		})
+	end;
+
+	["test: getParent() on Object is nil"] = function ()
+		LuaUnit.assertNil(Class(Object):getParent())
+	end;
+
+	["test: getChildren() on Object contains all \"base\" classes"] = function ()
+		LuaUnit.assertEquals(Class(Object):getChildren(), {
+			TypeBase = TypeBase,
+			ExampleA = ExampleA
+		})
+	end;
+
+	["test: Deriving from multiple classes raises error"] = function ()
+		LuaUnit.assertErrorMsgContains(
+			"Cannot declare class \"ExampleError\". Classes can extend only single class",
+			function ()
+				class "ExampleError" extends (Object, ExampleA) {}
+			end
+		)
+	end;
+
+	["test: Class won't be created after deriving from multiple classes"] = function ()
+		pcall(function ()
+			class "ExampleError" extends (Object, ExampleA) {}
+		end)
+		LuaUnit.assertNil(NotExampleErrorExisting)
+	end;
 
 	["test: Extending undefined class raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(

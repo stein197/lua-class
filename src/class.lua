@@ -44,9 +44,9 @@ Type = {
 	end;
 
 	descriptorHandler = function (descriptor)
-		Type.Check.metaAbsence(descriptor)
 		local last = Type.__last
 		local meta = last.__meta
+		Type.Check.metaAbsence(meta.type, descriptor)
 		switch (meta.type) {
 			[Type.CLASS] = function ()
 				-- TODO: Проверить что реально работает
@@ -118,10 +118,17 @@ Type = {
 			end
 		end;
 
-		metaAbsence = function (descriptor)
+		metaAbsence = function (entityType, descriptor)
 			if descriptor.__meta then
 				Type.deleteLast()
-				error "Declaration of field \"__meta\" is not allowed"
+				error("Cannot declare "..(Type.getNameFromEnum(entityType))..". Declaration of field \"__meta\" is not allowed")
+			end
+		end;
+
+		extending = function (entityType, name, baseList)
+			if entityType == Type.CLASS and #baseList > 1 then
+				Type.deleteLast()
+				error("Cannot declare "..(Type.getNameFromEnum(entityType)).." \""..name.."\". Classes can extend only single class")
 			end
 		end;
 	}
@@ -200,9 +207,7 @@ function extends(...)
 	local typeList = {...}
 	switch (lastType.__meta.type) {
 		[Type.CLASS] = function ()
-			if #typeList > 1 then
-				warn("Classes can extend only single class")
-			end
+			Type.Check.extending(Type.CLASS, lastType.__meta.name, typeList)
 			local className = typeList[1]
 			local parent = Type.find(className)
 			if not parent then

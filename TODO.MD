@@ -19,3 +19,4 @@
 - [x] Remove types when creation error occures;
 - [ ] Add ability to call methods from inside constructor;
 - [ ] Add `permits` keyword to seal types
+- [ ] Add operator overloading methods
