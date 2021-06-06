@@ -8,10 +8,7 @@ TestMeta = {
 	end;
 
 	teardownClass = function ()
-		_G["ExampleA"] = nil
-		_G["ExampleB0"] = nil
-		_G["ExampleB1"] = nil
-		_G["ExampleC"] = nil
+		Type.delete(ExampleA)
 	end;
 
 	["test: getMeta() returns table"] = function ()

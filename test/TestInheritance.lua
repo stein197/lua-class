@@ -77,16 +77,7 @@ TestInheritance = {
 	end;
 
 	teardownClass = function ()
-		_G["ExampleA"] = nil
-		_G["ExampleB0"] = nil
-		_G["ExampleB1"] = nil
-		_G["ExampleB2"] = nil
-		_G["ExampleC0"] = nil
-		_G["ExampleC1"] = nil
-		_G["ExampleC2"] = nil
-		_G["ExampleD0"] = nil
-		_G["ExampleD1"] = nil
-		Object.__meta.children.ExampleA = nil
+		Type.delete(ExampleA)
 	end;
 
 	["test: Derived class inherits methods & properties"] = function ()

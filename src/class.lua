@@ -120,6 +120,44 @@ Type = {
 
 	-- end;
 
+	delete = function(ref)
+		if not ref then
+			return
+		end
+		if type(ref) == "string" then
+			ref = _G[ref]
+		end
+		if not ref or not ref.__meta or not ref.__meta.type or ref.__meta.type == Type.INSTANCE then
+			error "Cannot delete variable. It is not a type"
+		end
+		local typeName = ref.__meta.name
+		switch (ref.__meta.type) {
+			[Type.CLASS] = function ()
+				if ref.__meta.parent then
+					ref.__meta.parent.__meta.children[typeName] = nil
+				end
+				if ref.__meta.children then
+					for childName, child in pairs(ref.__meta.children) do
+						Type.delete(child.__meta.name)
+					end
+				end
+			end;
+			[Type.TRAIT] = function ()
+				if ref.__meta.traits then
+					for parentName, parent in pairs(ref.__meta.traits) do
+						parent.__meta.children[typeName] = nil
+					end
+				end
+				if ref.__meta.children then
+					for childName, child in pairs(ref.__meta.children) do
+						Type.delete(child.__meta.name)
+					end
+				end
+			end
+		}
+		_G[typeName] = nil
+	end;
+
 	deleteLast = function ()
 		_G[Type.__last.__meta.name] = nil
 		Type.__last = nil
@@ -214,6 +252,7 @@ function class(name)
 	return typeDecriptorHandler
 end
 
+-- Multiple inheritance instead of traiting?
 function trait(name)
 	Type.Check.name(Type.TRAIT, name)
 	Type.Check.absence(Type.TRAIT, name)

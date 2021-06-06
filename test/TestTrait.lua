@@ -35,16 +35,7 @@ TestTrait = {
 	end;
 
 	teardownClass = function ()
-		_G["TraitA"] = nil
-		_G["TraitB"] = nil
-		_G["TraitB0"] = nil
-		_G["TraitC"] = nil
-		_G["ExampleA"] = nil
-		_G["ExampleB"] = nil
-		_G["ExampleC"] = nil
-		_G["ExampleD"] = nil
-		_G["ExampleE"] = nil
-		_G["ExampleF"] = nil
+		Type.delete(ExampleA)
 	end;
 
 	test_existance = function ()

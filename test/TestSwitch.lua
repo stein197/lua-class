@@ -8,6 +8,8 @@ TestSwitch = {
 	teardownClass = function ()
 		_G['ExampleA'] = nil
 		_G['ExampleB'] = nil
+		Object.__meta.children.ExampleA = nil
+		Object.__meta.children.ExampleB = nil
 	end;
 
 	["test: Statement"] = function ()

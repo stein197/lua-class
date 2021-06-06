@@ -23,12 +23,9 @@ TestClass = {
 	end;
 
 	teardownClass = function ()
-		_G["ExampleA"] = nil
-		_G["ExampleB"] = nil
-		_G["ExampleC"] = nil
-		Object.__meta.children.ExampleA = nil
-		Object.__meta.children.ExampleB = nil
-		Object.__meta.children.ExampleC = nil
+		Type.delete(ExampleA)
+		Type.delete(ExampleB)
+		Type.delete(ExampleC)
 	end;
 
 	["test: Classes exist"] = function ()
