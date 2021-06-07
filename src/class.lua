@@ -78,11 +78,10 @@ local function checkTypeMetaAbsence(entityType, name, descriptor)
 end
 
 local function typeDecriptorHandler(descriptor)
-	local last = __lastType
-	local meta = last.__meta
+	local meta = __lastType.__meta
 	checkTypeMetaAbsence(meta.type, meta.name, descriptor)
-	last = setmetatable(descriptor, {
-		__index = last;
+	setmetatable(descriptor, {
+		__index = __lastType;
 		__call = function (...)
 			local object = setmetatable({}, {
 				__index = _G[meta.name]
@@ -96,10 +95,10 @@ local function typeDecriptorHandler(descriptor)
 			return object
 		end
 	})
-	if last.__meta.parent then
-		last.__meta.parent.__meta.children[meta.name] = last
+	if descriptor.__meta.parent then
+		descriptor.__meta.parent.__meta.children[meta.name] = descriptor
 	end
-	_G[meta.name] = last
+	_G[meta.name] = descriptor
 	__lastType = nil
 end
 
