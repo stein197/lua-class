@@ -30,8 +30,16 @@ local function deleteLastType()
 	__lastType = nil
 end
 
+local function getTypeNameFromEnum(value)
+	return switch (value) {
+		[Type.INSTANCE] = "instance";
+		[Type.CLASS] = "class";
+	}
+end;
+
+
 local function getDeclarationMessageError(entityType, name)
-	return "Cannot declare "..Type.getNameFromEnum(entityType).." \""..name.."\""
+	return "Cannot declare "..getTypeNameFromEnum(entityType).." \""..name.."\""
 end
 
 local function concatSentenceList(...)
@@ -55,7 +63,7 @@ local function checkTypeAbsence(entityType, name)
 	if foundType then
 		local errMsg = getDeclarationMessageError(entityType, name)
 		if type(foundType) == "table" and foundType.__meta and foundType.__meta.type then
-			error(concatSentenceList(errMsg, Type.getNameFromEnum(foundType.__meta.type).." with this name already exists"))
+			error(concatSentenceList(errMsg, getTypeNameFromEnum(foundType.__meta.type).." with this name already exists"))
 		else
 			error(concatSentenceList(errMsg, "Global variable with this name already exists"))
 		end
@@ -110,13 +118,6 @@ Type = {
 		else
 			return name
 		end
-	end;
-
-	getNameFromEnum = function (value)
-		return switch (value) {
-			[Type.INSTANCE] = "instance";
-			[Type.CLASS] = "class";
-		}
 	end;
 
 	delete = function(ref)
@@ -206,7 +207,7 @@ function extends(...)
 	end
 	if parent.__meta.type ~= Type.CLASS then
 		deleteLastType()
-		error("Class cannot extend "..Type.getNameFromEnum(parent.__meta.type).." \""..className.."\"")
+		error("Class cannot extend "..getTypeNameFromEnum(parent.__meta.type).." \""..className.."\"")
 	end
 	lastType.__meta.parent = parent
 	_G[lastType.__meta.name] = setmetatable(lastType, {
