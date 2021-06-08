@@ -90,13 +90,14 @@ local function typeDecriptorHandler(descriptor)
 				descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
 			end
 			object.__meta = {
-				type = Type.INSTANCE
+				type = Type.INSTANCE,
+				class = descriptor
 			}
 			return object
 		end
 	})
-	if descriptor.__meta.parent then
-		descriptor.__meta.parent.__meta.children[meta.name] = descriptor
+	if __lastType.__meta.parent then
+		__lastType.__meta.parent.__meta.children[meta.name] = descriptor
 	end
 	_G[meta.name] = descriptor
 	__lastType = nil
@@ -132,6 +133,9 @@ Type = {
 		local typeName = ref.__meta.name
 		if ref.__meta.parent then
 			ref.__meta.parent.__meta.children[typeName] = nil
+			if #ref.__meta.parent.__meta.children == 0 then
+				ref.__meta.parent.__meta.children = nil
+			end
 		end
 		if ref.__meta.children then
 			for childName, child in pairs(ref.__meta.children) do
@@ -162,19 +166,29 @@ Object = {
 				error("Cannot find class")
 			end
 		end
-		local metaTable = getmetatable(self)
-		while metaTable ~= nil and metaTable.__index ~= ref do
-			metaTable = getmetatable(metaTable.__index)
+		local parents = {
+			self.__meta.class
+		}
+		while #parents > 0 do
+			local parent = parents[#parents]
+			if parent == ref then
+				break
+			end
+			parents[#parents] = nil
+			local parentBaseList = parent.__meta.parents
+			if parentBaseList then
+				local i = 1
+				for k, v in pairs(parentBaseList) do
+					parents[#parents + i] = v
+					i = i + 1
+				end
+			end
 		end
-		return metaTable ~= nil
+		return #parents > 0
 	end;
 
 	getClass = function (self)
-		local metatable = getmetatable(self)
-		if metatable then
-			return metatable.__index
-		end
-		return nil
+		return self.__meta.class
 	end;
 }
 
@@ -195,26 +209,38 @@ function class(name)
 	return typeDecriptorHandler
 end
 
+-- TODO: Check method overlapping in ...
+-- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
 function extends(...)
-	local lastType = __lastType
-	local typeList = {...}
-	local className = typeList[1]
-	local parent = Type.find(className)
-	if not parent then
-		deleteLastType()
-		error("Cannot find class \""..className.."\"")
+	local parents = {}
+	for i, parent in pairs({...}) do
+		local parentRef = Type.find(parent)
+		if not parentRef then
+			deleteLastType()
+			error("Cannot find class \""..parent.."\"")
+		end
+		if parentRef.__meta.type ~= Type.CLASS then
+			deleteLastType()
+			error("Class cannot extend "..getTypeNameFromEnum(parentRef.__meta.type).." \""..parent.."\"")
+		end
+		parents[parentRef.__meta.name] = parentRef
+		if not parentRef.__meta.children then
+			parentRef.__meta.children = {}
+		end
 	end
-	if parent.__meta.type ~= Type.CLASS then
-		deleteLastType()
-		error("Class cannot extend "..getTypeNameFromEnum(parent.__meta.type).." \""..className.."\"")
-	end
-	lastType.__meta.parent = parent
-	_G[lastType.__meta.name] = setmetatable(lastType, {
-		__index = parent
+	__lastType.__meta.parents = parents
+	setmetatable(__lastType, {
+		__index = function (self, key)
+			local baseClasses = self.__meta.parents
+			for name, ref in pairs(baseClasses) do
+				local m = ref[key]
+				if m then
+					self[key] = m -- TODO: Need save?
+					return m
+				end
+			end
+		end;
 	})
-	if not parent.__meta.children then
-		parent.__meta.children = {}
-	end
 	return typeDecriptorHandler
 end
 
