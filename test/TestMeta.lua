@@ -29,10 +29,10 @@ TestMeta = {
 		LuaUnit.assertEquals(Class(ExampleB0):getMeta("parent"), ExampleA)
 	end;
 
-	["test: getParent() is correct"] = function ()
-		LuaUnit.assertNil(Class(Object):getParent())
-		LuaUnit.assertEquals(Class(ExampleA):getParent(), Object)
-		LuaUnit.assertEquals(Class(ExampleB1):getParent(), ExampleA)
+	["test: getParents() is correct"] = function ()
+		LuaUnit.assertNil(Class(Object):getParents())
+		LuaUnit.assertEquals(Class(ExampleA):getParents(), {Object = Object})
+		LuaUnit.assertEquals(Class(ExampleB1):getParents(), {ExampleA = ExampleA})
 	end;
 
 	["test: getName() is correct"] = function ()

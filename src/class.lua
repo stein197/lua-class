@@ -96,8 +96,8 @@ local function typeDecriptorHandler(descriptor)
 			return object
 		end
 	})
-	if __lastType.__meta.parent then
-		__lastType.__meta.parent.__meta.children[meta.name] = descriptor
+	for parentName, parent in pairs(__lastType.__meta.parents) do
+		parent.__meta.children[meta.name] = descriptor
 	end
 	_G[meta.name] = descriptor
 	__lastType = nil
