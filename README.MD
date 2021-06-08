@@ -130,6 +130,5 @@ Object is the toppest class that all classes derive automatically. It has the ne
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
 |Method|Description|
 |---|---|
-|`Class():getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`|
-
-The `Class` class contains point methods to retrieve single entries like `getName()`, `getParents()` etc.
+|`Class(<type>):getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`|
+|`Class(<type>):delete()`|Completely deletes type|

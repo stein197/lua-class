@@ -183,41 +183,30 @@ TestInheritance = {
 		LuaUnit.assertEquals(ExampleD1():getClass(), ExampleD1)
 	end;
 
-	["test: getMeta(\"parents\") == getParents()"] = function ()
-		LuaUnit.assertEquals(Class(ExampleA):getParents(), Class(ExampleA):getMeta("parents"))
-		LuaUnit.assertEquals(Class(ExampleC1):getParents(), Class(ExampleC1):getMeta("parents"))
-		LuaUnit.assertEquals(Class(ExampleD0):getParents(), Class(ExampleD0):getMeta("parents"))
+	["test: getMeta(\"parents\") returns extended class"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getMeta("parents"), {Object = Object})
+		LuaUnit.assertEquals(Class(ExampleB0):getMeta("parents"), {ExampleA = ExampleA})
+		LuaUnit.assertEquals(Class(ExampleC0):getMeta("parents"), {ExampleB0 = ExampleB0})
+		LuaUnit.assertEquals(Class(ExampleD1):getMeta("parents"), {ExampleC1 = ExampleC1})
 	end;
 
-	["test: getParents() returns extended class"] = function ()
-		LuaUnit.assertEquals(Class(ExampleA):getParents(), {Object = Object})
-		LuaUnit.assertEquals(Class(ExampleB0):getParents(), {ExampleA = ExampleA})
-		LuaUnit.assertEquals(Class(ExampleC0):getParents(), {ExampleB0 = ExampleB0})
-		LuaUnit.assertEquals(Class(ExampleD1):getParents(), {ExampleC1 = ExampleC1})
-	end;
-
-	["test: getMeta(\"children\") == getChildren()"] = function ()
-		LuaUnit.assertEquals(Class(ExampleA):getChildren(), Class(ExampleA):getMeta("children"))
-		LuaUnit.assertEquals(Class(ExampleB0):getChildren(), Class(ExampleB0):getMeta("children"))
-	end;
-
-	["test: getChildren() returns all child classes"] = function ()
-		LuaUnit.assertEquals(Class(ExampleA):getChildren(), {
+	["test: getMeta(\"children\") returns all child classes"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getMeta("children"), {
 			ExampleB0 = ExampleB0,
 			ExampleB1 = ExampleB1,
 			ExampleB2 = ExampleB2
 		})
-		LuaUnit.assertEquals(Class(ExampleB1):getChildren(), {
+		LuaUnit.assertEquals(Class(ExampleB1):getMeta("children"), {
 			ExampleC1 = ExampleC1,
 		})
 	end;
 
-	["test: getParents() on Object is nil"] = function ()
-		LuaUnit.assertNil(Class(Object):getParents())
+	["test: getMeta(\"parents\") on Object is nil"] = function ()
+		LuaUnit.assertNil(Class(Object):getMeta("parents"))
 	end;
 
-	["test: getChildren() on Object contains all \"base\" classes"] = function ()
-		LuaUnit.assertEquals(Class(Object):getChildren(), {
+	["test: getMeta(\"children\") on Object contains all base classes"] = function ()
+		LuaUnit.assertEquals(Class(Object):getMeta("children"), {
 			TypeBase = TypeBase,
 			ExampleA = ExampleA
 		})

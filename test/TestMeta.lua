@@ -31,24 +31,24 @@ TestMeta = {
 		LuaUnit.assertEquals(Class(ExampleB0):getMeta("parents"), {ExampleA = ExampleA})
 	end;
 
-	["test: getParents() is correct"] = function ()
-		LuaUnit.assertNil(Class(Object):getParents())
-		LuaUnit.assertEquals(Class(ExampleA):getParents(), {Object = Object})
-		LuaUnit.assertEquals(Class(ExampleB1):getParents(), {ExampleA = ExampleA})
+	["test: getMeta(\"parents\") is correct"] = function ()
+		LuaUnit.assertNil(Class(Object):getMeta("parents"))
+		LuaUnit.assertEquals(Class(ExampleA):getMeta("parents"), {Object = Object})
+		LuaUnit.assertEquals(Class(ExampleB1):getMeta("parents"), {ExampleA = ExampleA})
 	end;
 
-	["test: getName() is correct"] = function ()
-		LuaUnit.assertEquals(Class(ExampleC):getName(), "ExampleC")
+	["test: getMeta(\"name\") is correct"] = function ()
+		LuaUnit.assertEquals(Class(ExampleC):getMeta("name"), "ExampleC")
 	end;
 
-	["test: getChildren() is correct"] = function ()
-		LuaUnit.assertEquals(Class(ExampleA):getChildren(), {
+	["test: getMeta(\"children\") is correct"] = function ()
+		LuaUnit.assertEquals(Class(ExampleA):getMeta("children"), {
 			ExampleB0 = ExampleB0;
 			ExampleB1 = ExampleB1;
 		})
-		LuaUnit.assertEquals(Class(ExampleB1):getChildren(), {
+		LuaUnit.assertEquals(Class(ExampleB1):getMeta("children"), {
 			ExampleC = ExampleC
 		})
-		LuaUnit.assertNil(Class(ExampleC):getChildren())
+		LuaUnit.assertNil(Class(ExampleC):getMeta("children"))
 	end;
 }

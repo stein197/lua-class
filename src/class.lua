@@ -122,6 +122,7 @@ Type = {
 		end
 	end;
 
+	-- TODO: But it does not delete from instances
 	delete = function(ref)
 		if not ref then
 			return
@@ -299,22 +300,9 @@ class 'TypeBase' {
 		end
 	end;
 
-	getName = function (self)
-		return self:getMeta("name")
-	end;
-
 	delete = function (self)
 		Type.delete(self)
 	end;
 }
 
-class "Class" extends 'TypeBase' {
-
-	getParents = function (self)
-		return self:getMeta("parents")
-	end;
-
-	getChildren = function (self)
-		return self:getMeta("children")
-	end;
-}
+class "Class" extends 'TypeBase' {}
