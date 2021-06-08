@@ -16,12 +16,12 @@ end
 
 local __lastType = nil
 
-local function deleteLastType()
+local function delete_last_type()
 	Type.delete(__lastType)
 	__lastType = nil
 end
 
-local function getTypeNameFromEnum(value)
+local function get_type_name_from_enum(value)
 	return switch (value) {
 		[Type.INSTANCE] = "instance";
 		[Type.CLASS] = "class";
@@ -29,11 +29,11 @@ local function getTypeNameFromEnum(value)
 end;
 
 
-local function getDeclarationMessageError(entityType, name)
-	return "Cannot declare "..getTypeNameFromEnum(entityType).." \""..name.."\""
+local function get_declaration_message_error(entityType, name)
+	return "Cannot declare "..get_type_name_from_enum(entityType).." \""..name.."\""
 end
 
-local function concatSentenceList(...)
+local function concat_sentence_list(...)
 	local sentenceList = {...}
 	for i, sentence in pairs(sentenceList) do
 		sentenceList[i] = sentence:gsub("^%s*([a-z])", function (fChar)
@@ -43,34 +43,34 @@ local function concatSentenceList(...)
 	return table.concat(sentenceList, ". ")
 end
 
-local function checkTypeName(entityType, name)
+local function check_type_name(entityType, name)
 	if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
-		error(concatSentenceList(getDeclarationMessageError(entityType, name), "The name contains invalid characters"))
+		error(concat_sentence_list(get_declaration_message_error(entityType, name), "The name contains invalid characters"))
 	end
 end
 
-local function checkTypeAbsence(entityType, name)
+local function check_type_absence(entityType, name)
 	local foundType = Type.find(name)
 	if foundType then
-		local errMsg = getDeclarationMessageError(entityType, name)
+		local errMsg = get_declaration_message_error(entityType, name)
 		if type(foundType) == "table" and foundType.__meta and foundType.__meta.type then
-			error(concatSentenceList(errMsg, getTypeNameFromEnum(foundType.__meta.type).." with this name already exists"))
+			error(concat_sentence_list(errMsg, get_type_name_from_enum(foundType.__meta.type).." with this name already exists"))
 		else
-			error(concatSentenceList(errMsg, "Global variable with this name already exists"))
+			error(concat_sentence_list(errMsg, "Global variable with this name already exists"))
 		end
 	end
 end
 
-local function checkTypeMetaAbsence(entityType, name, descriptor)
+local function check_type_meta_absence(entityType, name, descriptor)
 	if descriptor.__meta then
-		deleteLastType()
-		error(concatSentenceList(getDeclarationMessageError(entityType, name), "Declaration of field \"__meta\" is not allowed"))
+		delete_last_type()
+		error(concat_sentence_list(get_declaration_message_error(entityType, name), "Declaration of field \"__meta\" is not allowed"))
 	end
 end
 
-local function typeDecriptorHandler(descriptor)
+local function type_descriptor_handler(descriptor)
 	local meta = __lastType.__meta
-	checkTypeMetaAbsence(meta.type, meta.name, descriptor)
+	check_type_meta_absence(meta.type, meta.name, descriptor)
 	setmetatable(descriptor, {
 		__index = __lastType;
 		__call = function (...)
@@ -94,7 +94,7 @@ local function typeDecriptorHandler(descriptor)
 	__lastType = nil
 end
 
-local function typeIndex(self, key)
+local function type_index(self, key)
 	local baseClasses = self.__meta.parents
 	for name, ref in pairs(baseClasses) do
 		local m = ref[key]
@@ -198,8 +198,8 @@ Object = {
 }
 
 function class(name)
-	checkTypeName(Type.CLASS, name)
-	checkTypeAbsence(Type.CLASS, name)
+	check_type_name(Type.CLASS, name)
+	check_type_absence(Type.CLASS, name)
 	local ref = setmetatable({
 		__meta = {
 			name = name,
@@ -209,11 +209,11 @@ function class(name)
 			}
 		}
 	}, {
-		__index = typeIndex
+		__index = type_index
 	})
 	_G[name] = ref
 	__lastType = ref
-	return typeDecriptorHandler
+	return type_descriptor_handler
 end
 
 -- TODO: Check method overlapping in ...
@@ -223,12 +223,12 @@ function extends(...)
 	for i, parent in pairs({...}) do
 		local parentRef = Type.find(parent)
 		if not parentRef then
-			deleteLastType()
+			delete_last_type()
 			error("Cannot find class \""..parent.."\"")
 		end
 		if parentRef.__meta.type ~= Type.CLASS then
-			deleteLastType()
-			error("Class cannot extend "..getTypeNameFromEnum(parentRef.__meta.type).." \""..parent.."\"")
+			delete_last_type()
+			error("Class cannot extend "..get_type_name_from_enum(parentRef.__meta.type).." \""..parent.."\"")
 		end
 		parents[parentRef.__meta.name] = parentRef
 		if not parentRef.__meta.children then
@@ -237,9 +237,9 @@ function extends(...)
 	end
 	__lastType.__meta.parents = parents
 	setmetatable(__lastType, {
-		__index = typeIndex
+		__index = type_index
 	})
-	return typeDecriptorHandler
+	return type_descriptor_handler
 end
 
 function switch(variable)
