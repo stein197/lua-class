@@ -67,16 +67,41 @@ local function check_type_meta_absence(entityType, name, descriptor)
 	end
 end
 
+-- TODO
+local function get_all_type_methods(ref)
+	return {}
+end
+
+local function check_type_methods_overlapping(entityType, name, typeA, typeB)
+	local methodsA = get_all_type_methods(typeA)
+	for i, mName in ipairs(methodsA) do
+		if typeB[mName] then
+			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Method \""..mName.."\" in "..get_type_name_from_enum(entityType).." \""..typeA.__meta.name.."\" conflicts with method with the same name in \""..typeB.__meta.name.."\""))
+		end
+	end
+end
+
 -- TODO: Check method overlapping in ...
 -- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
 local function check_type_extend_list(entityType, name, extendList)
-	for i, parent in pairs(extendList) do
+	for i = 1, #extendList do
+		local parent = extendList[i]
 		if parent.__meta.type ~= Type.CLASS then
 			delete_last_type()
 			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Cannot extend "..get_type_name_from_enum(parent.__meta.type).." \""..parent.."\""))
 		end
+		for j = i, #extendList do
+			if i == j then
+				goto continue
+			end
+			local compareParent = extendList[j]
+			check_type_methods_overlapping(entityType, name, parent, compareParent)
+			::continue::
+		end
 	end
 end
+
+
 
 local function resolve_type_extend_list(entityType, name, extendList)
 	local parentList = {}
