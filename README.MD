@@ -1,6 +1,6 @@
 # Lua OOP emulator
 ## Basic concepts
-This simple lua package allows to emulate object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project and use it like follows:
+This simple lua package allows to emulate object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project and use it like this:
 ```lua
 class "A" {
 
@@ -18,12 +18,12 @@ class "A" {
 	end
 }
 ```
-Instantiating is done by direct calling of class name:
+Instantiating is done by direct calling a class name:
 ```lua
 local a = A(1, 2)
 a:echo() -- Prints "Echo from A class"
 ```
-All classes are registered in global namespace `_G` - that's why we can access class directly as a function name rather than string as it's dont in class definition. All classes are derived from `Object` class. This class contains two methods - `instanceof()` and `getClass()` which are useful. The first one accepts either string or class reference directly, the second returns class reference:
+All classes are registered in global namespace `_G` - that's why we can access class directly as a function name rather than string as it's done in class definition. All classes are derived from `Object` class. This class contains two methods - `instanceof()` and `getClass()` which are useful. The first one accepts either string or class reference directly, the second returns class reference:
 ```lua
 a:instanceof "A" -- True
 a:instanceof(A) -- True
@@ -31,14 +31,14 @@ a:instanceof(Object) -- True
 a:instanceof(B) -- False
 a:instanceof(a:getClass()) -- True
 ```
-If there is a try to create already existing class, an error will be thrown:
+If there is a try to create already existing class, an error will be raised:
 ```lua
 class "A" {--[[ ... ]]}
-class "A" {} -- Throws "Cannot declare class. Variable or class with name "A" already exists"
+class "A" {} --> Raises error
 ```
 There is a restriction on class names. They only can contain alphanumeric characters and cannot start with number:
 ```lua
-class "0 numeric.dot" {} -- Throws "Cannot declare class. Classname "0 numeric" contains invalid characters"
+class "0 numeric.dot" {} --> Raises error
 ```
 ## Inheritance
 This package also supports inheritance:
@@ -50,7 +50,7 @@ class "B" extends "A" {
 	end
 }
 ```
-The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from B class". There is also support for constructor and property overriding.
+The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from A class". There is also support for constructor and property overriding.
 
 ## Multiple inheritance
 Classes can derive from multiple base classes:
