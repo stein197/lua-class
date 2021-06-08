@@ -114,7 +114,9 @@ TestInheritance = {
 	["test: \"__meta\" field always overrides"] = function ()
 		LuaUnit.assertEquals(ExampleB0.__meta, {
 			name = "ExampleB0",
-			parent = ExampleA,
+			parents = {
+				ExampleA = ExampleA
+			},
 			type = Type.CLASS,
 			children = {
 				ExampleC0 = ExampleC0
@@ -122,7 +124,9 @@ TestInheritance = {
 		})
 		LuaUnit.assertEquals(ExampleD1.__meta, {
 			name = "ExampleD1",
-			parent = ExampleC1,
+			parents = {
+				ExampleC1 = ExampleC1
+			},
 			type = Type.CLASS,
 		})
 	end;

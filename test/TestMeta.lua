@@ -16,7 +16,9 @@ TestMeta = {
 		LuaUnit.assertEquals(Class(ExampleA):getMeta(), {
 			name = "ExampleA",
 			type = Type.CLASS,
-			parent = Object,
+			parents = {
+				Object = Object
+			},
 			children = {
 				ExampleB0 = ExampleB0,
 				ExampleB1 = ExampleB1,
@@ -26,7 +28,7 @@ TestMeta = {
 
 	["test: getMeta(<key>) returns single entry"] = function ()
 		LuaUnit.assertEquals(Class(ExampleB0):getMeta("name"), "ExampleB0")
-		LuaUnit.assertEquals(Class(ExampleB0):getMeta("parent"), ExampleA)
+		LuaUnit.assertEquals(Class(ExampleB0):getMeta("parents"), {ExampleA = ExampleA})
 	end;
 
 	["test: getParents() is correct"] = function ()

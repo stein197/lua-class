@@ -138,19 +138,23 @@ Type = {
 		if type(ref) == "string" then
 			ref = _G[ref]
 		end
+		if ref == Object then
+			error "Deleting \"Object\" class is not allowed"
+		end
 		if not ref or not ref.__meta or not ref.__meta.type or ref.__meta.type == Type.INSTANCE then
 			error "Cannot delete variable. It is not a type"
 		end
 		local typeName = ref.__meta.name
-		if ref.__meta.parent then
-			ref.__meta.parent.__meta.children[typeName] = nil
-			if #ref.__meta.parent.__meta.children == 0 then
-				ref.__meta.parent.__meta.children = nil
+		for parentName, parent in pairs(ref.__meta.parents) do
+			parent.__meta.children[typeName] = nil
+			if #parent.__meta.children == 0--[[  and parent ~= Object ]] then
+				-- TODO: It throws error sometimes
+				-- parent.__meta.children = nil
 			end
 		end
 		if ref.__meta.children then
 			for childName, child in pairs(ref.__meta.children) do
-				Type.delete(child.__meta.name)
+				Type.delete(child)
 			end
 		end
 		_G[typeName] = nil
