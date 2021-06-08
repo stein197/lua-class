@@ -284,7 +284,7 @@ function switch(variable)
 end
 
 function default() end
-function null() end
+function null() end -- TODO: Delete
 
 class 'TypeBase' {
 

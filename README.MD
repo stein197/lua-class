@@ -52,6 +52,41 @@ class "B" extends "A" {
 ```
 The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from B class". There is also support for constructor and property overriding.
 
+## Multiple inheritance
+Classes can derive from multiple base classes:
+```lua
+class 'A' {
+
+	a = function ()
+		return "a"
+	end;
+}
+
+class 'B' {
+
+	b = function ()
+		return "b"
+	end;
+}
+
+class 'C' extends (A, 'B') {
+
+	c = function ()
+		return "c"
+	end;
+}
+C():a() -- returns "a"
+```
+And also can override methods. But when there is an attempt to derive from classes that contain colliding method names, or derive from already derived class (deep chain), error is raised:
+```lua
+-- Suppose class A and B contain the same method named "method"
+class 'C' extends (A, B) {} -- Raises error
+-- Next example:
+class 'A' {}
+class 'B' extends 'A'
+class 'C' extends (B, A) {} -- Error is here because class A is already derived in B
+```
+
 ## Switch statement
 You can create switch-like statements and even expressions using function `switch`:
 ```lua
@@ -77,15 +112,24 @@ print(var) -- Prints "2"
 ```
 
 ## API
+This library provides simple API to manage hierarchies or to retrieve extra info.
+### Type API
+|Method|Description|
+|---|---|
+|`Type.find(<type>)`|Finds and returns type by its name. Nil if type wasn't found|
+|`Type.delete(<type>)`|Completely deletes type from hierarchy and global scope. If type has child types, then they are going to die too|
+
+### Object class API
+Object is the toppest class that all classes derive automatically. It has the next useful methods:
 |Method|Description|
 |---|---|
 |`Object():getClass()`|Returns reference to a class that created current instance|
-|`Object():instanceof(classname)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
+|`Object():instanceof(<class>)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
 
+### Class wrapper API
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
 |Method|Description|
 |---|---|
-|`Class():getMeta()`|Returns metainfo about class as a table. The returned table contains fields `name`, `parent`|
-|`Class():getName()`|Same as `Class():getMeta("name")`|
-|`Class():getParent()`|Same as `Class():getMeta("parent")`|
+|`Class():getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`|
 
+The `Class` class contains point methods to retrieve single entries like `getName()`, `getParents()` etc.
