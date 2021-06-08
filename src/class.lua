@@ -28,7 +28,6 @@ local function get_type_name_from_enum(value)
 	}
 end;
 
-
 local function get_declaration_message_error(entityType, name)
 	return "Cannot declare "..get_type_name_from_enum(entityType).." \""..name.."\""
 end
@@ -66,6 +65,29 @@ local function check_type_meta_absence(entityType, name, descriptor)
 		delete_last_type()
 		error(concat_sentence_list(get_declaration_message_error(entityType, name), "Declaration of field \"__meta\" is not allowed"))
 	end
+end
+
+-- TODO: Check method overlapping in ...
+-- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
+local function check_type_extend_list(entityType, name, extendList)
+	for i, parent in pairs(extendList) do
+		if parent.__meta.type ~= Type.CLASS then
+			delete_last_type()
+			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Cannot extend "..get_type_name_from_enum(parent.__meta.type).." \""..parent.."\""))
+		end
+	end
+end
+
+local function resolve_type_extend_list(entityType, name, extendList)
+	local parentList = {}
+	for i, parent in pairs(extendList) do
+		local parentRef = Type.find(parent)
+		if not parentRef then
+			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Cannot find "..get_type_name_from_enum(entityType).." \""..parent.."\""))
+		end
+		table.insert(parentList, parentRef)
+	end
+	return parentList
 end
 
 local function type_descriptor_handler(descriptor)
@@ -216,23 +238,14 @@ function class(name)
 	return type_descriptor_handler
 end
 
--- TODO: Check method overlapping in ...
--- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
 function extends(...)
 	local parents = {}
-	for i, parent in pairs({...}) do
-		local parentRef = Type.find(parent)
-		if not parentRef then
-			delete_last_type()
-			error("Cannot find class \""..parent.."\"")
-		end
-		if parentRef.__meta.type ~= Type.CLASS then
-			delete_last_type()
-			error("Class cannot extend "..get_type_name_from_enum(parentRef.__meta.type).." \""..parent.."\"")
-		end
-		parents[parentRef.__meta.name] = parentRef
-		if not parentRef.__meta.children then
-			parentRef.__meta.children = {}
+	local extendList = resolve_type_extend_list(Type.CLASS, __lastType.__meta.name, {...})
+	check_type_extend_list(Type.CLASS, __lastType.__meta.name, extendList)
+	for i, parent in pairs(extendList) do
+		parents[parent.__meta.name] = parent
+		if not parent.__meta.children then
+			parent.__meta.children = {}
 		end
 	end
 	__lastType.__meta.parents = parents
