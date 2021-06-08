@@ -103,6 +103,17 @@ local function typeDecriptorHandler(descriptor)
 	__lastType = nil
 end
 
+local function typeIndex(self, key)
+	local baseClasses = self.__meta.parents
+	for name, ref in pairs(baseClasses) do
+		local m = ref[key]
+		if m then
+			-- self[key] = m -- TODO: Need save?
+			return m
+		end
+	end
+end
+
 Type = {
 
 	INSTANCE = 0;
@@ -174,13 +185,11 @@ Object = {
 			if parent == ref then
 				break
 			end
-			parents[#parents] = nil
+			table.remove(parents, #parents)
 			local parentBaseList = parent.__meta.parents
 			if parentBaseList then
-				local i = 1
 				for k, v in pairs(parentBaseList) do
-					parents[#parents + i] = v
-					i = i + 1
+					table.insert(parents, v)
 				end
 			end
 		end
@@ -197,12 +206,14 @@ function class(name)
 	checkTypeAbsence(Type.CLASS, name)
 	local ref = setmetatable({
 		__meta = {
-			name = name;
-			type = Type.CLASS;
-			parent = Object;
+			name = name,
+			type = Type.CLASS,
+			parents = {
+				Object = Object
+			}
 		}
 	}, {
-		__index = Object
+		__index = typeIndex
 	})
 	_G[name] = ref
 	__lastType = ref
@@ -230,16 +241,7 @@ function extends(...)
 	end
 	__lastType.__meta.parents = parents
 	setmetatable(__lastType, {
-		__index = function (self, key)
-			local baseClasses = self.__meta.parents
-			for name, ref in pairs(baseClasses) do
-				local m = ref[key]
-				if m then
-					self[key] = m -- TODO: Need save?
-					return m
-				end
-			end
-		end;
+		__index = typeIndex
 	})
 	return typeDecriptorHandler
 end
@@ -284,6 +286,16 @@ class 'TypeBase' {
 
 	ref = nil;
 
+	constructor = function (self, ref)
+		if not ref then
+			error "Type reference cannot be nil"
+		end
+		self.ref = Type.find(ref)
+		if not self.ref then
+			error("Cannot find type \""..ref.."\"")
+		end
+	end;
+
 	getMeta = function (self, key)
 		if key then
 			return self.ref.__meta[key]
@@ -295,22 +307,16 @@ class 'TypeBase' {
 	getName = function (self)
 		return self:getMeta("name")
 	end;
+
+	delete = function (self)
+		Type.delete(self)
+	end;
 }
 
 class "Class" extends 'TypeBase' {
 
-	constructor = function (self, ref)
-		if not ref then
-			error "Class reference cannot be nil"
-		end
-		self.ref = Type.find(ref)
-		if not self.ref then
-			error("Cannot find class \""..ref.."\"")
-		end
-	end;
-
-	getParent = function (self)
-		return self:getMeta("parent")
+	getParents = function (self)
+		return self:getMeta("parents")
 	end;
 
 	getChildren = function (self)

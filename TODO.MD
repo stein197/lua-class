@@ -6,7 +6,6 @@
 - [ ] Add interfaces and implements keyword;
 - [ ] Add try-catch-throw;
 - [ ] Add import keyword;
-- [x] Add traits;
 - [ ] Add inner classes (via lastclassname as table instead of string);
 - [ ] Add `clone()` method;
 - [x] Optionally add an ability to get class name;
