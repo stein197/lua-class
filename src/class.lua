@@ -1,13 +1,4 @@
-function string.split(self, separator)
-	separator = separator or "%s"
-	local parts = {}
-	for part in self:gmatch("([^"..separator.."]*)") do
-		table.insert(parts, part)
-	end
-	return parts
-end
-
-function table.slice(tbl, from, to)
+local function sliceTable(tbl, from, to)
 	local sliced = {}
 	from = from or 1
 	to = to or #tbl
@@ -87,7 +78,7 @@ local function typeDecriptorHandler(descriptor)
 				__index = _G[meta.name]
 			})
 			if descriptor.constructor then
-				descriptor.constructor(object, table.unpack(table.slice({...}, 2)))
+				descriptor.constructor(object, table.unpack(sliceTable({...}, 2)))
 			end
 			object.__meta = {
 				type = Type.INSTANCE,
