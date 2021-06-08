@@ -1,7 +1,9 @@
 # CHANGELOG
-## 1.5.0
+## 2.0.0
 ### Features
-- Added traits support
+- Added multiple inheritance support
+- Extracted "private" methods from `Type` to local functions
+- Test not have concise description
 - Added `default` case in switch statement
 - Added `null` function in case of using null values in tables
 ## 1.4.0
