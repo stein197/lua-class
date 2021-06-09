@@ -101,13 +101,12 @@ local function check_type_extend_list(entityType, name, extendList)
 	end
 end
 
-
-
 local function resolve_type_extend_list(entityType, name, extendList)
 	local parentList = {}
 	for i, parent in pairs(extendList) do
 		local parentRef = Type.find(parent)
 		if not parentRef then
+			delete_last_type()
 			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Cannot find "..get_type_name_from_enum(entityType).." \""..parent.."\""))
 		end
 		table.insert(parentList, parentRef)
