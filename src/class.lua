@@ -323,8 +323,49 @@ function switch(variable)
 	end
 end
 
+function try(f)
+	if type(f) == "table" then
+		f = f[1]
+	end
+	local silent, message = pcall(f)
+	return TryCatchFinally(silent, message)
+end
+
 function default() end
 function null() end -- TODO: Delete
+
+class 'TryCatchFinally' {
+
+	silent = nil;
+	message = nil;
+	caught = false;
+
+	constructor = function (self, silent, message)
+		self.silent = silent
+		self.message = message
+	end;
+	
+	catch = function (self, f)
+		if self.caught then
+			error "Cannot call catch twice"
+		end
+		self.caught = true
+		if not self.silent then
+			if type(f) == "table" then
+				f = f[1]
+			end
+			f(self.message)
+		end
+		return self
+	end;
+
+	finally = function (self, f)
+		if type(f) == "table" then
+			f = f[1]
+		end
+		return f()
+	end;
+}
 
 class 'TypeBase' {
 
