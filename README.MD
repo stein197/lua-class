@@ -107,7 +107,55 @@ local var = switch "b" {
 }
 print(var) -- Prints "2"
 ```
-
+## Try-catch-finally
+The library provies pretty standard try-catch-finally feature:
+```lua
+try(function ()
+	error "Error"
+end):catch(function (msg)
+	print(msg) -- Prints error message from previous function
+end):finally(function ()
+	print "Finally" -- Always executes
+end)
+```
+You can pass a table containing single function instead of a function to make syntax more "curly":
+```lua
+try {
+	function ()
+		error "Error"
+	end
+} :catch {
+	function (msg)
+		print(msg)
+	end
+} :finally {
+	function ()
+		print "Finally"
+	end
+}
+```
+Since `try`, `catch` and `finally` are just functions, the last closure can be used as an expression to assign or pass values:
+```lua
+local msg = try {
+	function ()
+		error "Error"
+	end
+} :finally {
+	function ()
+		return "Finally"
+	end
+}
+print(msg) --> "Finally"
+```
+Note that you cannot do this to `catch` because it always returns a table that contain method `finally`, so using it as an expression could confuse you:
+```lua
+local msg = try {} :catch {
+	function ()
+		return "Catch"
+	end
+}
+print(msg) --> {finally = function () ... end}
+```
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
 ### Type API

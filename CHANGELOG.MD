@@ -1,4 +1,7 @@
 # CHANGELOG
+## 2.1.0
+### Features
+- Added try-catch-finally clause
 ## 2.0.0
 ### Features
 - Added multiple inheritance support
