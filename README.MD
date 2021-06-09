@@ -156,6 +156,22 @@ local msg = try {} :catch {
 }
 print(msg) --> {finally = function () ... end}
 ```
+You can also pass values to next methods:
+```lua
+try {
+	function ()
+		return "try"
+	end
+} :catch {
+	function ()
+		return "catch"
+	end
+} :finally {
+	function (msg)
+		print(msg) --> "try"
+	end
+}
+```
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
 ### Type API

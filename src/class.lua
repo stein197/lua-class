@@ -327,8 +327,8 @@ function try(f)
 	if type(f) == "table" then
 		f = f[1]
 	end
-	local silent, message = pcall(f)
-	return TryCatchFinally(silent, message)
+	local silent, result = pcall(f)
+	return TryCatchFinally(silent, result)
 end
 
 function default() end
@@ -337,12 +337,12 @@ function null() end -- TODO: Delete
 class 'TryCatchFinally' {
 
 	silent = nil;
-	message = nil;
+	result = nil;
 	caught = false;
 
-	constructor = function (self, silent, message)
+	constructor = function (self, silent, result)
 		self.silent = silent
-		self.message = message
+		self.result = result
 	end;
 	
 	catch = function (self, f)
@@ -354,7 +354,7 @@ class 'TryCatchFinally' {
 			if type(f) == "table" then
 				f = f[1]
 			end
-			f(self.message)
+			self.result = f(self.result)
 		end
 		return self
 	end;
@@ -363,7 +363,7 @@ class 'TryCatchFinally' {
 		if type(f) == "table" then
 			f = f[1]
 		end
-		return f()
+		return f(self.result)
 	end;
 }
 
