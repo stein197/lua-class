@@ -208,7 +208,8 @@ TestInheritance = {
 	["test: getMeta(\"children\") on Object contains all base classes"] = function ()
 		LuaUnit.assertEquals(Class(Object):getMeta("children"), {
 			TypeBase = TypeBase,
-			ExampleA = ExampleA
+			ExampleA = ExampleA,
+			TryCatchFinally = TryCatchFinally
 		})
 	end;
 

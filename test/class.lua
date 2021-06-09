@@ -5,6 +5,7 @@ dofile "test/TestMeta.lua"
 dofile "test/TestInheritance.lua"
 dofile "test/TestSwitch.lua"
 dofile "test/TestMultipleInheritance.lua"
+dofile "test/TestTryCatchFinally.lua"
 local runner = LuaUnit.LuaUnit.new()
 runner:setOutputType("text")
 os.exit(runner:runSuite())
