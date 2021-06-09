@@ -214,7 +214,7 @@ TestInheritance = {
 
 	["test: Extending undefined class raises error"] = function ()
 		LuaUnit.assertErrorMsgContains(
-			"Cannot find class \"NotDefined\"",
+			"Cannot declare class \"ErrorClass1\". Cannot find class \"NotDefined\"",
 			function ()
 				class "ErrorClass1" extends "NotDefined" {}
 			end

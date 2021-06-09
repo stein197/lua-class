@@ -40,21 +40,6 @@ TestMultipleInheritance = {
 		)
 	end;
 
-	["test: Declaration error is thrown when methods collide in base classes"] = function ()
-		LuaUnit.assertErrorMsgContains(
-			"Cannot declare class \"ExampleF\". Method \"method\" in class \"ExampleD\" conflicts with method of the same name in class \"ExampleE\"",
-			function ()
-				class 'ExampleF' extends (ExampleD, ExampleE) {}
-			end
-		)
-		LuaUnit.assertErrorMsgContains(
-			"Cannot declare class \"ExampleF\". Method \"method\" in class \"ExampleE\" conflicts with method of the same name in class \"ExampleD\"",
-			function ()
-				class 'ExampleF' extends (ExampleE, ExampleD) {}
-			end
-		)
-	end;
-
 	["test: Class inherits all methods from base classes"] = function ()
 		LuaUnit.assertEquals(ExampleC():a(), 'a')
 		LuaUnit.assertEquals(ExampleC():b(), 'b')
