@@ -68,7 +68,24 @@ local function check_type_meta_absence(entityType, name, descriptor)
 end
 
 -- TODO
-local function check_type_extend_deriving(entityType, name, typeA, typeB)
+local function check_type_not_deriving(entityType, name, typeA, typeB)
+	local parents = {
+		typeA
+	}
+	while #parents > 0 do
+		local parent = parents[#parents]
+		if parent == typeB then
+			delete_last_type()
+			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Class \""..typeB.__meta.name.."\" is already a base of class \""..typeA.__meta.name.."\""))
+		end
+		table.remove(parents, #parents)
+		local parentBaseList = parent.__meta.parents
+		if parentBaseList then
+			for k, v in pairs(parentBaseList) do
+				table.insert(parents, v)
+			end
+		end
+	end
 end
 
 -- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
@@ -84,7 +101,8 @@ local function check_type_extend_list(entityType, name, extendList)
 				goto continue
 			end
 			local compareParent = extendList[j]
-			check_type_extend_deriving(entityType, name, parent, compareParent)
+			check_type_not_deriving(entityType, name, parent, compareParent)
+			check_type_not_deriving(entityType, name, compareParent, parent)
 			::continue::
 		end
 	end

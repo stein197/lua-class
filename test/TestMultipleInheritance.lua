@@ -54,7 +54,7 @@ TestMultipleInheritance = {
 			class 'ExampleF' extends (ExampleC, ExampleB) {}
 		end)
 		pcall(function ()
-			class 'ExampleF' extends (ExampleD, ExampleE) {}
+			class 'ExampleF' extends (ExampleB, ExampleC) {}
 		end)
 		LuaUnit.assertNil(ExampleF)
 	end;

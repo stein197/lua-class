@@ -221,6 +221,8 @@ TestInheritance = {
 		)
 	end;
 
+	["test: Class cannot extend itself"] = function () error "Not implemented" end; -- TODO
+
 	["test: Class won't be created after extending undefined class"] = function ()
 		pcall(function ()
 			class "NotExisting" extends "NotDefined" {}
