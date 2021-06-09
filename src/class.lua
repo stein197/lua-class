@@ -1,4 +1,4 @@
-local function sliceTable(tbl, from, to)
+local function table_slice(tbl, from, to)
 	local sliced = {}
 	from = from or 1
 	to = to or #tbl
@@ -135,7 +135,7 @@ local function type_descriptor_handler(descriptor)
 				__index = _G[meta.name]
 			})
 			if descriptor.constructor then
-				descriptor.constructor(object, table.unpack(sliceTable({...}, 2)))
+				descriptor.constructor(object, table.unpack(table_slice({...}, 2)))
 			end
 			object.__meta = {
 				type = Type.INSTANCE,
