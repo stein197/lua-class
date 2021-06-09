@@ -77,11 +77,8 @@ class 'C' extends (A, 'B') {
 }
 C():a() -- returns "a"
 ```
-And also can override methods. But when there is an attempt to derive from classes that contain colliding method names, or derive from already derived class (deep chain), error is raised:
+And also can override methods. But when there is an attempt to derive from already derived class (deep chain), error is raised:
 ```lua
--- Suppose class A and B contain the same method named "method"
-class 'C' extends (A, B) {} -- Raises error
--- Next example:
 class 'A' {}
 class 'B' extends 'A'
 class 'C' extends (B, A) {} -- Error is here because class A is already derived in B

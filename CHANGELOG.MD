@@ -4,7 +4,7 @@
 - Added multiple inheritance support
 - Extracted "private" methods from `Type` to local functions
 - Added ability to delete types via `Type.delete()` or `TypeBase():delete()`
-- Test not have concise description
+- Tests now have detailed description
 - Removed redudant methods `Class(<type>):get*()` from Class API
 - Added `default` case in switch statement
 - Added `null` function in case of using null values in tables
