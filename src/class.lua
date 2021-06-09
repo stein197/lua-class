@@ -96,6 +96,10 @@ local function check_type_extend_list(entityType, name, extendList)
 			delete_last_type()
 			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Cannot extend "..get_type_name_from_enum(parent.__meta.type).." \""..parent.."\""))
 		end
+		if parent == __lastType then
+			delete_last_type()
+			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Class cannot extend itself"))
+		end
 		for j = i, #extendList do
 			if i == j then
 				goto continue

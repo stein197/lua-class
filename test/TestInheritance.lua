@@ -221,7 +221,14 @@ TestInheritance = {
 		)
 	end;
 
-	["test: Class cannot extend itself"] = function () error "Not implemented" end; -- TODO
+	["test: Class cannot extend itself"] = function ()
+		LuaUnit.assertErrorMsgContains(
+			"Cannot declare class \"SelfExtend\". Class cannot extend itself",
+			function ()
+				class "SelfExtend" extends "SelfExtend" {}
+			end
+		)
+	end; -- TODO
 
 	["test: Class won't be created after extending undefined class"] = function ()
 		pcall(function ()
