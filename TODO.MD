@@ -14,4 +14,4 @@
 - [x] Add fallback for switch
 - [x] Remove types when creation error occures
 - [ ] Add ability to call methods from inside constructor
-- [ ] Add operator overloading methods
+- [x] Add operator overloading methods
