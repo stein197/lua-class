@@ -14,6 +14,17 @@ local function table_slice(tbl, from, to)
 	return sliced
 end
 
+local function string_split(inputstr, sep)
+	if sep == nil then
+		sep = "%s"
+	end
+	local t={}
+	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+		table.insert(t, str)
+	end
+	return t
+end
+
 local __lastType = nil
 
 local function delete_last_type()
@@ -44,9 +55,22 @@ local function concat_sentence_list(...)
 end
 
 local function check_type_name(entityType, name)
-	if not name:match("^[a-zA-Z][a-zA-Z0-9]*$") then
-		error(concat_sentence_list(get_declaration_message_error(entityType, name), "The name contains invalid characters"))
-	end
+	local regex = "^%a%w*$"
+	switch (entityType) {
+		[Type.CLASS] = function ()
+			if not name:match(regex) then
+				error(concat_sentence_list(get_declaration_message_error(entityType, name), "The name contains invalid characters"))
+			end
+		end;
+		[Type.NAMESPACE] = function ()
+			local parts = string_split(name, ".")
+			for i, part in ipairs(parts) do
+				if not part:match(regex) then
+					error(concat_sentence_list(get_declaration_message_error(entityType, name), "The name contains invalid characters"))
+				end
+			end
+		end;
+	}
 end
 
 local function check_type_absence(entityType, name)
@@ -293,7 +317,9 @@ function extends(...)
 end
 
 -- TODO
-function namespace(name) end
+function namespace(name)
+	check_type_name(Type.NAMESPACE, name)
+end
 
 function switch(variable)
 	return function (map)
