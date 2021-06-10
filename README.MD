@@ -193,3 +193,6 @@ There is also special Class API. This package defines own class `Class` which ca
 |---|---|
 |`Class(<type>):getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`|
 |`Class(<type>):delete()`|Completely deletes type|
+
+## Tests
+To run tests, call from terminal `.\test.bat` for Windows and `./test.sh` for Linux
