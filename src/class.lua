@@ -319,6 +319,12 @@ end
 -- TODO
 function namespace(name)
 	check_type_name(Type.NAMESPACE, name)
+	local nameParts = string_split(name, ".")
+	local lastRef
+	for i, part in ipairs(name) do
+
+	end
+	return type_descriptor_handler
 end
 
 function switch(variable)
