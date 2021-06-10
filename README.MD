@@ -1,6 +1,6 @@
 # Lua OOP emulator
 ## Basic concepts
-This simple lua package allows to emulate object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project and use it like this:
+Sometimes there is a need to use classes in language that does not support them at all. Fortunately, lua allows us to use some sort of object-oriented paradigm by its dynamic nature. This simple lua package allows to use object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project and use it like this:
 ```lua
 class "A" {
 
@@ -18,12 +18,12 @@ class "A" {
 	end
 }
 ```
-Instantiating is done by direct calling a class name:
+This code creates table named "A" in global space. To instantiate a class, call the table:
 ```lua
 local a = A(1, 2)
 a:echo() -- Prints "Echo from A class"
 ```
-All classes are registered in global namespace `_G` - that's why we can access class directly as a function name rather than string as it's done in class definition. All classes are derived from `Object` class. This class contains two methods - `instanceof()` and `getClass()` which are useful. The first one accepts either string or class reference directly, the second returns class reference:
+Since all classes are registered in global namespace `_G` - that's why we can access classes directly as a function name rather than string as it's done in class definition. All classes are derived from `Object` class. This class contains two useful methods - `instanceof()` and `getClass()`. The first one accepts either string or class reference directly, the second returns class reference:
 ```lua
 a:instanceof "A" -- True
 a:instanceof(A) -- True
@@ -36,7 +36,7 @@ If there is a try to create already existing class, an error will be raised:
 class "A" {--[[ ... ]]}
 class "A" {} --> Raises error
 ```
-There is a restriction on class names. They only can contain alphanumeric characters and cannot start with number:
+There is a restriction on class names. They only can contain alphanumeric characters and cannot start with a number:
 ```lua
 class "0 numeric.dot" {} --> Raises error
 ```
@@ -53,7 +53,7 @@ class "B" extends "A" {
 The method `echo` overrides the parent's one. If we omit the method, then it'll return "Echo from A class". There is also support for constructor and property overriding.
 
 ## Multiple inheritance
-Classes can derive from multiple base classes:
+Classes can also derive from multiple base classes:
 ```lua
 class 'A' {
 
@@ -107,7 +107,7 @@ local var = switch "b" {
 }
 print(var) -- Prints "2"
 ```
-## Try-catch-finally
+## Try-catch-finally statement
 The library provies pretty standard try-catch-finally feature:
 ```lua
 try(function ()
