@@ -1,13 +1,103 @@
 TestOpertatorOverloading = {
 
 	setupClass = function ()
-		class 'Overloading' {}
+		class 'Overloading' {
+			newindex = 0;
+			len = 10;
+			tostring = "Overloading";
+			add = 20;
+			sub = 30;
+			mul = 40;
+			div = 50;
+			pow = 60;
+			mod = 70;
+			idiv = 80;
+			eq = "eq";
+			lt = 90;
+			le = 100;
+			band = 1;
+			bor = 1;
+			bxor = 2;
+			bnot = true;
+			bshl = 1;
+			bshr = 1;
+			__newindex = function (self, key, value)
+				self:getClass()[key] = value * 2
+			end;
+			__call = function (self, ...)
+				return {...}
+			end;
+			__tostring = function (self)
+				return self.tostring
+			end;
+			__concat = function (self, value)
+				return self:__tostring()..value..self:__tostring()
+			end;
+			__metatable = false;
+			-- __mode
+			-- __gc
+			__len = function (self)
+				return self.len
+			end;
+			-- __pairs
+			-- __ipairs
+			__add = function (self, value)
+				return self.add + value
+			end;
+			__sub = function (self, value)
+				return self.sub - value;
+			end;
+			__mul = function (self, value)
+				return self.mul * value
+			end;
+			__div = function (self, value)
+				return self.div / value
+			end;
+			__pow = function (self, value)
+				return self.pow ^ value
+			end;
+			__mod = function (self, value)
+				return self.mod % value
+			end;
+			__idiv = function (self, value)
+				return self.idiv // value
+			end;
+			__eq = function (self, value)
+				return self.eq == value
+			end;
+			__lt = function (self, value)
+				return self.lt < value
+			end;
+			__le = function (self, value)
+				return self.le <= value
+			end;
+			__band = function (self, value)
+				return self.band & value
+			end;
+			__bor = function (self, value)
+				return self.bor | value
+			end;
+			__bxor = function (self, value)
+				return self.bxor ~ value
+			end;
+			__bnot = function (self)
+				return not self.bnot
+			end;
+			__bshl = function (self, value)
+				return self.bshl << value
+			end;
+			__bshr = function (self, value)
+				return self.bshr >> value
+			end;
+		}
+		class 'OverloadingChild' extends 'Overloading' {}
 	end;
 
 	teardownClass = function ()
 		Type.delete(Overloading)
 	end;
 
+	["test: __index() raises error"] = function () error "Not implemented" end; -- TODO
 	["test: __newindex() -> [] is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __call() -> () is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __tostring() -> tostring() is correct"] = function () error "Not implemented" end; -- TODO
@@ -31,7 +121,7 @@ TestOpertatorOverloading = {
 	["test: __band() -> & is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bor() -> | is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bxor() -> ~ is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __bnot() -> ~ is correct"] = function () error "Not implemented" end; -- TODO
+	["test: __bnot() -> not is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bshl() -> << is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bshr() -> >> is correct"] = function () error "Not implemented" end; -- TODO
 	["test: Overloaded operator in parent is being inherited in child class"] = function () error "Not implemented" end; -- TODO
