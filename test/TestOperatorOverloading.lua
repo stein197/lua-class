@@ -27,4 +27,5 @@ TestOpertatorOverloading = {
 	["test: __bnot() -> ~ is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bshl() -> << is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bshr() -> >> is correct"] = function () error "Not implemented" end; -- TODO
+	["test: Overloaded operator in parent is being inherited in child class"] = function () error "Not implemented" end; -- TODO
 }
