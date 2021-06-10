@@ -1,6 +1,13 @@
 TestOpertatorOverloading = {
 
-	["test: __index() -> [] is correct"] = function () error "Not implemented" end; -- TODO
+	setupClass = function ()
+		class 'Overloading' {}
+	end;
+
+	teardownClass = function ()
+		Type.delete(Overloading)
+	end;
+
 	["test: __newindex() -> [] is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __call() -> () is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __tostring() -> tostring() is correct"] = function () error "Not implemented" end; -- TODO
