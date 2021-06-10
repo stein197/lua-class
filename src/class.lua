@@ -131,8 +131,35 @@ local function type_descriptor_handler(descriptor)
 	setmetatable(descriptor, {
 		__index = __lastType;
 		__call = function (...)
+			local parent = _G[meta.name]
 			local object = setmetatable({}, {
-				__index = _G[meta.name]
+				__index = parent,
+				__newindex = parent.__newindex,
+				__call = parent.__call,
+				__tostring = parent.__tostring,
+				__concat = parent.__concat,
+				__metatable = parent.__metatable,
+				__mode = parent.__mode,
+				__gc = parent.__gc,
+				__len = parent.__len,
+				__pairs = parent.__pairs,
+				__ipairs = parent.__ipairs,
+				__add = parent.__add,
+				__sub = parent.__sub,
+				__mul = parent.__mul,
+				__div = parent.__div,
+				__pow = parent.__pow,
+				__mod = parent.__mod,
+				__idiv = parent.__idiv,
+				__eq = parent.__eq,
+				__lt = parent.__lt,
+				__le = parent.__le,
+				__band = parent.__band,
+				__bor = parent.__bor,
+				__bxor = parent.__bxor,
+				__bnot = parent.__bnot,
+				__bshl = parent.__bshl,
+				__bshr = parent.__bshr
 			})
 			if descriptor.constructor then
 				descriptor.constructor(object, table.unpack(table_slice({...}, 2)))
