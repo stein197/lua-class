@@ -25,6 +25,7 @@ local function get_type_name_from_enum(value)
 	return switch (value) {
 		[Type.INSTANCE] = "instance";
 		[Type.CLASS] = "class";
+		[Type.NAMESPACE] = "namespace";
 	}
 end;
 
@@ -166,6 +167,7 @@ Type = {
 
 	INSTANCE = 0;
 	CLASS = 1;
+	NAMESPACE = 2;
 
 	find = function (name)
 		local nameType = type(name)
@@ -289,6 +291,9 @@ function extends(...)
 	})
 	return type_descriptor_handler
 end
+
+-- TODO
+function namespace(name) end
 
 function switch(variable)
 	return function (map)
