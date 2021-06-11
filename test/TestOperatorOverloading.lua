@@ -2,7 +2,6 @@ TestOpertatorOverloading = {
 
 	setupClass = function ()
 		class 'Overloading' {
-			newindex = 5;
 			len = 10;
 			tostring = "Overloading";
 			add = 20;
@@ -21,9 +20,6 @@ TestOpertatorOverloading = {
 			bnot = true;
 			shl = 1;
 			shr = 3;
-			-- __newindex = function (self, key, value)
-			-- 	self:getClass()[key] = value * 2
-			-- end;
 			__call = function (self, ...)
 				return {...}
 			end;
@@ -99,7 +95,6 @@ TestOpertatorOverloading = {
 			end
 		}
 		class 'OverloadingKeys' {
-			newindex = 0;
 			len = 10;
 			add = 20;
 			sub = 30;
@@ -117,9 +112,6 @@ TestOpertatorOverloading = {
 			bnot = true;
 			shl = 1;
 			shr = 3;
-			-- ["[]"] = function (self, key, value)
-			-- 	self:getClass()[key] = value * 2
-			-- end;
 			["()"] = function (self, ...)
 				return {...}
 			end;
@@ -195,8 +187,6 @@ TestOpertatorOverloading = {
 			end
 		)
 	end;
-
-	["test: __newindex() is correct"] = function () error "Not implemented" end; -- TODO
 
 	["test: __call() is correct"] = function ()
 		LuaUnit.assertEquals(Overloading()("a", "b", "c"), {"a", "b", "c"})
@@ -291,7 +281,6 @@ TestOpertatorOverloading = {
 
 	["test: __mode() is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __gc() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"[]\"] is correct"] = function () error "Not implemented" end; -- TODO
 
 	["test: [\"()\"] is correct"] = function ()
 		LuaUnit.assertEquals(OverloadingKeys()("a", "b", "c"), {"a", "b", "c"})

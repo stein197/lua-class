@@ -15,3 +15,4 @@
 - [x] Remove types when creation error occures
 - [ ] Add ability to call methods from inside constructor
 - [x] Add operator overloading methods
+- [ ] Add `__newindex` overloading
