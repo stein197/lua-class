@@ -33,8 +33,15 @@ TestOpertatorOverloading = {
 			__len = function (self)
 				return self.len
 			end;
-			-- __pairs
-			-- __ipairs
+			__pairs = function ()
+				local a = 0
+				return function ()
+					a = a + 1
+					if a < 10 then
+						return a
+					end
+				end
+			end;
 			__add = function (self, value)
 				return self.add + value
 			end;
@@ -206,8 +213,14 @@ TestOpertatorOverloading = {
 		LuaUnit.assertEquals(#Overloading(), 10);
 	end;
 
-	["test: __pairs() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __ipairs() is correct"] = function () error "Not implemented" end; -- TODO
+	["test: __pairs() is correct"] = function ()
+		local a = Overloading()
+		local t = {}
+		for i in pairs(a) do
+			table.insert(t, i)
+		end
+		LuaUnit.assertEquals(t, {1, 2, 3, 4, 5, 6, 7, 8, 9})
+	end;
 
 	["test: __add() is correct"] = function ()
 		LuaUnit.assertEquals(Overloading() + 100, 120)
