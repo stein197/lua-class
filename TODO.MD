@@ -11,3 +11,4 @@
 - [x] Remove types when creation error occures
 - [x] Add ability to call methods from inside constructor
 - [ ] Add operator overloading methods
+- [ ] Important - save instance prototype to parent.__meta.__proto - it'll decrease the number of tables in memory
