@@ -2,7 +2,7 @@ TestOpertatorOverloading = {
 
 	setupClass = function ()
 		class 'Overloading' {
-			newindex = 0;
+			newindex = 5;
 			len = 10;
 			tostring = "Overloading";
 			add = 20;
@@ -17,13 +17,13 @@ TestOpertatorOverloading = {
 			le = 100;
 			band = 1;
 			bor = 1;
-			bxor = 2;
+			bxor = 1;
 			bnot = true;
 			bshl = 1;
 			bshr = 1;
-			__newindex = function (self, key, value)
-				self:getClass()[key] = value * 2
-			end;
+			-- __newindex = function (self, key, value)
+			-- 	self:getClass()[key] = value * 2
+			-- end;
 			__call = function (self, ...)
 				return {...}
 			end;
@@ -63,7 +63,7 @@ TestOpertatorOverloading = {
 				return self.idiv // value
 			end;
 			__eq = function (self, value)
-				return self.eq == value
+				return self.eq == value.eq
 			end;
 			__lt = function (self, value)
 				return self.lt < value
@@ -90,7 +90,14 @@ TestOpertatorOverloading = {
 				return self.bshr >> value
 			end;
 		}
-		class 'OverloadingChild' extends 'Overloading' {}
+		class 'OverloadingChild' extends 'Overloading' {
+			__sub = function (self, value)
+				return self.sub - value * 2
+			end;
+			["*"] = function (self, value)
+				return (self.mul * value + 1)
+			end
+		}
 		class 'OverloadingKeys' {
 			newindex = 0;
 			len = 10;
@@ -106,13 +113,13 @@ TestOpertatorOverloading = {
 			le = 100;
 			band = 1;
 			bor = 1;
-			bxor = 2;
+			bxor = 1;
 			bnot = true;
 			bshl = 1;
 			bshr = 1;
-			["[]"] = function (self, key, value)
-				self:getClass()[key] = value * 2
-			end;
+			-- ["[]"] = function (self, key, value)
+			-- 	self:getClass()[key] = value * 2
+			-- end;
 			["()"] = function (self, ...)
 				return {...}
 			end;
@@ -144,7 +151,7 @@ TestOpertatorOverloading = {
 				return self.idiv // value
 			end;
 			["=="] = function (self, value)
-				return self.eq == value
+				return self.eq == value.eq
 			end;
 			["<"] = function (self, value)
 				return self.lt < value
@@ -178,52 +185,205 @@ TestOpertatorOverloading = {
 		Type.delete(OverloadingKeys)
 	end;
 
-	["test: __index() raises error"] = function () error "Not implemented" end; -- TODO
-	["test: __newindex() -> [] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __call() -> () is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __tostring() -> tostring() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __concat() -> .. is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __metatable() -> getmetatable() is correct"] = function () error "Not implemented" end; -- TODO
+	["test: __index() raises error"] = function ()
+		LuaUnit.assertErrorMsgContains(
+			"Cannot declare class \"IndexOverloading\". Declaration of field \"__index\" is not allowed",
+			function ()
+				class "IndexOverloading" {
+					__index = {}
+				}
+			end
+		)
+	end;
+
+	["test: __newindex() is correct"] = function () error "Not implemented" end; -- TODO
+
+	["test: __call() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading()("a", "b", "c"), {"a", "b", "c"})
+	end;
+
+	["test: __tostring() is correct"] = function ()
+		LuaUnit.assertEquals(tostring(Overloading()), "Overloading")
+	end;
+
+	["test: __concat() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading().."string", "OverloadingstringOverloading")
+	end;
+
+	["test: __metatable() is correct"] = function ()
+		LuaUnit.assertFalse(getmetatable(Overloading()))
+	end;
+
+	["test: __len() is correct"] = function ()
+		LuaUnit.assertEquals(#Overloading(), 10);
+	end;
+
+	["test: __pairs() is correct"] = function () error "Not implemented" end; -- TODO
+	["test: __ipairs() is correct"] = function () error "Not implemented" end; -- TODO
+
+	["test: __add() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() + 100, 120)
+	end;
+
+	["test: __sub() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() - 100, -70)
+	end;
+
+	["test: __mul() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() * 100, 4000)
+	end;
+
+	["test: __div() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() / 25, 2)
+	end;
+
+	["test: __pow() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() ^ 2, 3600)
+	end;
+
+	["test: __mod() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() % 11, 4)
+	end;
+
+	["test: __idiv() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() // 6, 13)
+	end;
+
+	["test: __eq() is correct"] = function ()
+		local a = Overloading()
+		local b = Overloading()
+		a.a = "a"
+		b.b = "b"
+		LuaUnit.assertTrue(a == b)
+	end;
+
+	["test: __lt() is correct"] = function ()
+		LuaUnit.assertTrue(Overloading() < 100)
+	end;
+
+	["test: __le() is correct"] = function ()
+		LuaUnit.assertTrue(Overloading() <= 100)
+	end;
+
+	["test: __band() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() & 3, 1)
+	end;
+
+	["test: __bor() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() | 2, 3)
+	end;
+
+	["test: __bxor() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() ~ 3, 2)
+	end;
+
+	["test: __bnot() is correct"] = function ()
+		LuaUnit.assertFalse(not Overloading())
+	end;
+
+	["test: __bshl() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() << 3, 5)
+	end;
+
+	["test: __bshr() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() >> 10, 1)
+	end;
+
 	["test: __mode() is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __gc() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __len() -> # is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __pairs() -> pairs() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __ipairs() -> ipairs() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __add() -> + is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __sub() -> - is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __mul() -> * is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __div() -> / is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __pow() -> ^ is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __mod() -> percent_sign is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __idiv() -> // is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __eq() -> == is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __lt() -> < is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __le() -> <= is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __band() -> & is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __bor() -> | is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __bxor() -> ~ is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __bnot() -> not is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __bshl() -> << is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __bshr() -> >> is correct"] = function () error "Not implemented" end; -- TODO
 	["test: [\"[]\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"()\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"..\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"#\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"+\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"-\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"*\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"/\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"^\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"percent_sign\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"//\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"==\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"<\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"<=\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"&\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"|\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"~\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"not\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\"<<\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: [\">>\"] is correct"] = function () error "Not implemented" end; -- TODO
-	["test: Overloaded operator in parent is being inherited in child class"] = function () error "Not implemented" end; -- TODO
+
+	["test: [\"()\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys()("a", "b", "c"), {"a", "b", "c"})
+	end;
+
+	["test: [\"..\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys().."string", "OverloadingKeysstringOverloadingKeys")
+	end;
+
+	["test: [\"#\"] is correct"] = function ()
+		LuaUnit.assertEquals(#OverloadingKeys(), 10);
+	end;
+
+	["test: [\"+\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() + 100, 120)
+	end;
+
+	["test: [\"-\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() - 100, -70)
+	end;
+
+	["test: [\"*\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() * 100, 4000)
+	end;
+
+	["test: [\"/\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() / 2, 25)
+	end;
+
+	["test: [\"^\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() ^ 2, 3600)
+	end;
+
+	["test: [\"percent_sign\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() % 11, 4)
+	end;
+
+	["test: [\"//\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() // 6, 13)
+	end;
+
+	["test: [\"==\"] is correct"] = function ()
+		local a = OverloadingKeys()
+		local b = OverloadingKeys()
+		a.a = "a"
+		b.b = "b"
+		LuaUnit.assertTrue(a == b)
+	end;
+
+	["test: [\"<\"] is correct"] = function ()
+		LuaUnit.assertTrue(OverloadingKeys() < 100)
+	end;
+
+	["test: [\"<=\"] is correct"] = function ()
+		LuaUnit.assertTrue(OverloadingKeys() <= 100)
+	end;
+
+	["test: [\"&\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() & 3, 1)
+	end;
+
+	["test: [\"|\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() | 2, 3)
+	end;
+
+	["test: [\"~\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() ~ 3, 2)
+	end;
+
+	["test: [\"not\"] is correct"] = function ()
+		LuaUnit.assertFalse(not OverloadingKeys())
+	end;
+
+	["test: [\"<<\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() << 3, 5)
+	end;
+
+	["test: [\">>\"] is correct"] = function ()
+		LuaUnit.assertEquals(OverloadingKeys() >> 10, 1)
+	end;
+
+	["test: Classes won't be created after declaration errors"] = function ()
+		pcall(function ()
+			class "IndexOverloading" {__index = {}}
+		end)
+		LuaUnit.assertNil(IndexOverloading)
+	end;
+
+	["test: Overloaded operator in parent is being inherited/overrided in child class"] = function ()
+		LuaUnit.assertEquals(OverloadingChild() + 10, 30)
+		LuaUnit.assertEquals(#OverloadingChild(), 10)
+		LuaUnit.assertEquals(OverloadingChild() - 10, 10)
+		LuaUnit.assertEquals(OverloadingChild() * 10, 401)
+	end;
 }
