@@ -60,10 +60,10 @@ local function check_type_absence(entityType, name)
 	end
 end
 
-local function check_type_meta_absence(entityType, name, descriptor)
-	if descriptor.__meta then
+local function check_type_field_absence(entityType, name, descriptor, field)
+	if descriptor[field] then
 		delete_last_type()
-		error(concat_sentence_list(get_declaration_message_error(entityType, name), "Declaration of field \"__meta\" is not allowed"))
+		error(concat_sentence_list(get_declaration_message_error(entityType, name), "Declaration of field \""..field.."\" is not allowed"))
 	end
 end
 
@@ -127,7 +127,8 @@ end
 
 local function type_descriptor_handler(descriptor)
 	local meta = __lastType.__meta
-	check_type_meta_absence(meta.type, meta.name, descriptor)
+	check_type_field_absence(meta.type, meta.name, descriptor, "__meta")
+	check_type_field_absence(meta.type, meta.name, descriptor, "__index")
 	setmetatable(descriptor, {
 		__index = __lastType;
 		__call = function (...)
