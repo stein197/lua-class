@@ -91,10 +91,91 @@ TestOpertatorOverloading = {
 			end;
 		}
 		class 'OverloadingChild' extends 'Overloading' {}
+		class 'OverloadingKeys' {
+			newindex = 0;
+			len = 10;
+			add = 20;
+			sub = 30;
+			mul = 40;
+			div = 50;
+			pow = 60;
+			mod = 70;
+			idiv = 80;
+			eq = "eq";
+			lt = 90;
+			le = 100;
+			band = 1;
+			bor = 1;
+			bxor = 2;
+			bnot = true;
+			bshl = 1;
+			bshr = 1;
+			["[]"] = function (self, key, value)
+				self:getClass()[key] = value * 2
+			end;
+			["()"] = function (self, ...)
+				return {...}
+			end;
+			[".."] = function (self, value)
+				return "OverloadingKeys"..value.."OverloadingKeys"
+			end;
+			["#"] = function (self)
+				return self.len
+			end;
+			["+"] = function (self, value)
+				return self.add + value
+			end;
+			["-"] = function (self, value)
+				return self.sub - value;
+			end;
+			["*"] = function (self, value)
+				return self.mul * value
+			end;
+			["/"] = function (self, value)
+				return self.div / value
+			end;
+			["^"] = function (self, value)
+				return self.pow ^ value
+			end;
+			["%"] = function (self, value)
+				return self.mod % value
+			end;
+			["//"] = function (self, value)
+				return self.idiv // value
+			end;
+			["=="] = function (self, value)
+				return self.eq == value
+			end;
+			["<"] = function (self, value)
+				return self.lt < value
+			end;
+			["<="] = function (self, value)
+				return self.le <= value
+			end;
+			["&"] = function (self, value)
+				return self.band & value
+			end;
+			["|"] = function (self, value)
+				return self.bor | value
+			end;
+			["~"] = function (self, value)
+				return self.bxor ~ value
+			end;
+			["not"] = function (self)
+				return not self.bnot
+			end;
+			["<<"] = function (self, value)
+				return self.bshl << value
+			end;
+			[">>"] = function (self, value)
+				return self.bshr >> value
+			end;
+		}
 	end;
 
 	teardownClass = function ()
 		Type.delete(Overloading)
+		Type.delete(OverloadingKeys)
 	end;
 
 	["test: __index() raises error"] = function () error "Not implemented" end; -- TODO
@@ -124,5 +205,25 @@ TestOpertatorOverloading = {
 	["test: __bnot() -> not is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bshl() -> << is correct"] = function () error "Not implemented" end; -- TODO
 	["test: __bshr() -> >> is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"[]\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"()\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"..\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"#\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"+\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"-\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"*\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"/\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"^\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"percent_sign\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"//\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"==\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"<\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"<=\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"&\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"|\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"~\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"not\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\"<<\"] is correct"] = function () error "Not implemented" end; -- TODO
+	["test: [\">>\"] is correct"] = function () error "Not implemented" end; -- TODO
 	["test: Overloaded operator in parent is being inherited in child class"] = function () error "Not implemented" end; -- TODO
 }
