@@ -30,8 +30,6 @@ TestOpertatorOverloading = {
 				return self:__tostring()..value..self:__tostring()
 			end;
 			__metatable = false;
-			-- __mode
-			-- __gc
 			__len = function (self)
 				return self.len
 			end;
@@ -278,9 +276,6 @@ TestOpertatorOverloading = {
 	["test: __shr() is correct"] = function ()
 		LuaUnit.assertEquals(Overloading() >> 1, 1)
 	end;
-
-	["test: __mode() is correct"] = function () error "Not implemented" end; -- TODO
-	["test: __gc() is correct"] = function () error "Not implemented" end; -- TODO
 
 	["test: [\"()\"] is correct"] = function ()
 		LuaUnit.assertEquals(OverloadingKeys()("a", "b", "c"), {"a", "b", "c"})
