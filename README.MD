@@ -216,6 +216,9 @@ The following operators can be overloaded:
 |`__bshl`|`<<`|
 |`__bshr`|`>>`|
 
+Note that index definitions have a precedence over metamethod ones, so if you extend a class that defines 
+operators and then you override them, index definitions will be taken into account.
+and then you override them,
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
 ### Type API
