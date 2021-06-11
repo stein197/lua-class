@@ -159,8 +159,8 @@ local function type_descriptor_handler(descriptor)
 				__bor = parent["|"] or parent.__bor,
 				__bxor = parent["~"] or parent.__bxor,
 				__bnot = parent["not"] or parent.__bnot,
-				__bshl = parent["<<"] or parent.__bshl,
-				__bshr = parent[">>"] or parent.__bshr
+				__shl = parent["<<"] or parent.__shl,
+				__shr = parent[">>"] or parent.__shr
 			})
 			if descriptor.constructor then
 				descriptor.constructor(object, table.unpack(table_slice({...}, 2)))

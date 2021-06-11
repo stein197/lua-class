@@ -19,8 +19,8 @@ TestOpertatorOverloading = {
 			bor = 1;
 			bxor = 1;
 			bnot = true;
-			bshl = 1;
-			bshr = 1;
+			shl = 1;
+			shr = 3;
 			-- __newindex = function (self, key, value)
 			-- 	self:getClass()[key] = value * 2
 			-- end;
@@ -83,11 +83,11 @@ TestOpertatorOverloading = {
 			__bnot = function (self)
 				return not self.bnot
 			end;
-			__bshl = function (self, value)
-				return self.bshl << value
+			__shl = function (self, value)
+				return self.shl << value
 			end;
-			__bshr = function (self, value)
-				return self.bshr >> value
+			__shr = function (self, value)
+				return self.shr >> value
 			end;
 		}
 		class 'OverloadingChild' extends 'Overloading' {
@@ -115,8 +115,8 @@ TestOpertatorOverloading = {
 			bor = 1;
 			bxor = 1;
 			bnot = true;
-			bshl = 1;
-			bshr = 1;
+			shl = 1;
+			shr = 3;
 			-- ["[]"] = function (self, key, value)
 			-- 	self:getClass()[key] = value * 2
 			-- end;
@@ -172,10 +172,10 @@ TestOpertatorOverloading = {
 				return not self.bnot
 			end;
 			["<<"] = function (self, value)
-				return self.bshl << value
+				return self.shl << value
 			end;
 			[">>"] = function (self, value)
-				return self.bshr >> value
+				return self.shr >> value
 			end;
 		}
 	end;
@@ -281,12 +281,12 @@ TestOpertatorOverloading = {
 		LuaUnit.assertFalse(not Overloading())
 	end;
 
-	["test: __bshl() is correct"] = function ()
-		LuaUnit.assertEquals(Overloading() << 3, 5)
+	["test: __shl() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() << 3, 8)
 	end;
 
-	["test: __bshr() is correct"] = function ()
-		LuaUnit.assertEquals(Overloading() >> 10, 1)
+	["test: __shr() is correct"] = function ()
+		LuaUnit.assertEquals(Overloading() >> 1, 1)
 	end;
 
 	["test: __mode() is correct"] = function () error "Not implemented" end; -- TODO
@@ -366,11 +366,11 @@ TestOpertatorOverloading = {
 	end;
 
 	["test: [\"<<\"] is correct"] = function ()
-		LuaUnit.assertEquals(OverloadingKeys() << 3, 5)
+		LuaUnit.assertEquals(OverloadingKeys() << 3, 8)
 	end;
 
 	["test: [\">>\"] is correct"] = function ()
-		LuaUnit.assertEquals(OverloadingKeys() >> 10, 1)
+		LuaUnit.assertEquals(OverloadingKeys() >> 1, 1)
 	end;
 
 	["test: Classes won't be created after declaration errors"] = function ()
