@@ -14,6 +14,11 @@ local function table_slice(tbl, from, to)
 	return sliced
 end
 
+-- TODO
+local function table_clone(tbl)
+	return tbl
+end
+
 local __lastType = nil
 
 local function delete_last_type()
@@ -67,7 +72,6 @@ local function check_type_field_absence(entityType, name, descriptor, field)
 	end
 end
 
--- TODO
 local function check_type_not_deriving(entityType, name, typeA, typeB)
 	local parents = {
 		typeA
@@ -88,7 +92,6 @@ local function check_type_not_deriving(entityType, name, typeA, typeB)
 	end
 end
 
--- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
 local function check_type_extend_list(entityType, name, extendList)
 	for i = 1, #extendList do
 		local parent = extendList[i]
@@ -275,6 +278,20 @@ Object = {
 			end
 		end
 		return #parents > 0
+	end;
+
+	clone = function (self)
+		local clone = setmetatable({}, getmetatable(self))
+		for k, v in pairs(self) do
+			local vType = type(v)
+			local isScalar = vType == "boolean" or vType == "number" or vType == "string"
+			if isScalar then
+				clone[k] = v
+			elseif vType == "table" then
+				clone[k] = table_clone(v)
+			end
+		end
+		return clone
 	end;
 
 	getClass = function (self)
