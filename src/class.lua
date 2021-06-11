@@ -16,7 +16,20 @@ end
 
 -- TODO
 local function table_clone(tbl)
-	return tbl
+	if tbl.__meta and tbl.__meta.type == Type.INSTANCE then
+		return tbl:clone()
+	end
+	local clone = {}
+	for k, v in pairs(tbl) do
+		local vType = type(v)
+		local isScalar = vType == "boolean" or vType == "number" or vType == "string"
+		if isScalar then
+			clone[k] = v
+		elseif vType == "table" then
+			clone[k] = table_clone(v)
+		end
+	end
+	return clone
 end
 
 local __lastType = nil

@@ -232,6 +232,7 @@ Object is the toppest class that all classes derive automatically. It has the ne
 |---|---|
 |`Object():getClass()`|Returns reference to a class that created current instance|
 |`Object():instanceof(<class>)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
+|`Object():clone()`|Makes deep object clone|
 
 ### Class wrapper API
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:

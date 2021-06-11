@@ -1,4 +1,7 @@
 # CHANGELOG
+## 2.3.0
+### Features
+- Added `Object():clone()` method
 ## 2.2.0
 ### Features
 - Added operator overloading feature
