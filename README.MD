@@ -172,6 +172,50 @@ try {
 	end
 }
 ```
+## Operator overloading
+Since lua supports operator overloading, you can define own implementations for operators as usual metamethod name (as lua provides) or by explicit definintion as corresponding index:
+```lua
+class 'A' {
+	__add = function (self, value)
+		return "addition "..value
+	end;
+	["-"] = function (self, value)
+		return "substraction "..value
+	end;
+}
+A() + 1 --> "addition 1"
+A() - 1 --> "substraction 1"
+```
+The following operators can be overloaded:
+|Metamethod|Index name|
+|---|---|
+|`__newindex`|`[]`|
+|`__call`|`()`|
+|`__tostring`||
+|`__concat`|`..`|
+|`__metatable`||
+|`__mode`||
+|`__gc`||
+|`__len`|`#`|
+|`__pairs`||
+|`__ipairs`||
+|`__add`|`+`|
+|`__sub`|`-`|
+|`__mul`|`*`|
+|`__div`|`/`|
+|`__pow`|`^`|
+|`__mod`|`%`|
+|`__idiv`|`//`|
+|`__eq`|`==`|
+|`__lt`|`<`|
+|`__le`|`<=`|
+|`__band`|`&`|
+|`__bor`|`|`|
+|`__bxor`|`~`|
+|`__bnot`|`not`|
+|`__bshl`|`<<`|
+|`__bshr`|`>>`|
+
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
 ### Type API
