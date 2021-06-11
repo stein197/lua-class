@@ -23,7 +23,7 @@ local function table_clone(tbl)
 	for k, v in pairs(tbl) do
 		local vType = type(v)
 		local isScalar = vType == "boolean" or vType == "number" or vType == "string"
-		if isScalar or k == "__meta" then
+		if isScalar then
 			clone[k] = v
 		elseif vType == "table" then
 			clone[k] = table_clone(v)
