@@ -7,6 +7,7 @@ dofile "test/TestSwitch.lua"
 dofile "test/TestMultipleInheritance.lua"
 dofile "test/TestTryCatchFinally.lua"
 dofile "test/TestOperatorOverloading.lua"
+dofile "test/TestClone.lua"
 local runner = LuaUnit.LuaUnit.new()
 runner:setOutputType("text")
 os.exit(runner:runSuite())
