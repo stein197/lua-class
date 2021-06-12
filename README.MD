@@ -104,6 +104,9 @@ local var = switch "b" {
 	a = 1;
 	b = 2;
 	c = 3;
+	d = function ()
+		return 4; -- If you wish you can also use function blocks and return values from them
+	end;
 }
 print(var) -- Prints "2"
 ```
