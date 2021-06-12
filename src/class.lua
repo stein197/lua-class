@@ -14,7 +14,6 @@ local function table_slice(tbl, from, to)
 	return sliced
 end
 
--- TODO
 local function table_clone(tbl)
 	if tbl.__meta and tbl.__meta.type == Type.INSTANCE then
 		return tbl:clone()
@@ -390,7 +389,7 @@ function try(f)
 end
 
 function default() end
-function null() end -- TODO: Delete
+function null() end -- TODO: Delete?
 
 class 'TryCatchFinally' {
 
