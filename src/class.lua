@@ -438,9 +438,10 @@ function namespace(name)
 	return function (descriptor)
 		check_type_field_absence(Type.NAMESPACE, name, descriptor, "__meta")
 		check_type_field_absence(Type.NAMESPACE, name, descriptor, "__index")
-		for i, classRef in ipairs(descriptor) do
-			descriptor[classRef.__meta.name] = classRef
-			descriptor[i] = nil
+		for k, v in pairs(descriptor) do
+			if type(k) == "string" then
+				lastRef[k] = v
+			end
 		end
 		__meta.ns = _G
 	end
