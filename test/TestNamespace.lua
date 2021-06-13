@@ -45,5 +45,5 @@ TestNamespace = {
 	["test: Nested namespace can contain functions"] = function () error "Not implemented" end; -- TODO
 	["test: Classes can be referenced inside simple namespace"] = function () error "Not implemented" end; -- TODO
 	["test: Classes can be referenced inside nested namespace"] = function () error "Not implemented" end; -- TODO
-	["test: Classes contain extra field \"__meta.ns\""] = function () error "Not implemented" end; -- TODO
+	["test: Classes contain extra field \"__meta.namespace\""] = function () error "Not implemented" end; -- TODO
 }

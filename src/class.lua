@@ -31,6 +31,35 @@ local __meta = {
 	ns = _G
 }
 
+local function namespace_get_full_name(ns)
+	local result = ns.__meta.name
+	local current = ns.__meta.parent
+	while current do
+		result = current.__meta.name.."."..result
+		current = current.__meta.parent
+	end
+	return result
+end
+
+local function resolve_full_name(name)
+	if __meta.ns ~= _G then
+		return namespace_get_full_name(__meta.ns).."."..name
+	end
+	return name
+end
+
+local function resolve_type_from_string(ref)
+	local parts = string_split(ref, ".")
+	ref = _G
+	for i, part in pairs(parts) do
+		ref = ref[part]
+		if not ref then
+			return nil
+		end
+	end
+	return ref
+end
+
 local function delete_last_type()
 	Type.delete(__meta.lastType)
 	__meta.lastType = nil
@@ -45,7 +74,7 @@ local function get_type_name_from_enum(value)
 end;
 
 local function get_declaration_message_error(entityType, name)
-	return "Cannot declare "..get_type_name_from_enum(entityType).." \""..name.."\""
+	return "Cannot declare "..get_type_name_from_enum(entityType).." \""..resolve_full_name(name).."\""
 end
 
 local function concat_sentence_list(...)
@@ -78,7 +107,7 @@ local function check_type_name(entityType, name)
 end
 
 local function check_type_absence(entityType, name)
-	local foundType = Type.find(name)
+	local foundType = Type.find(resolve_full_name(name))
 	if foundType then
 		local errMsg = get_declaration_message_error(entityType, name)
 		if type(foundType) == "table" and foundType.__meta and foundType.__meta.type then
@@ -99,6 +128,12 @@ local function check_ns_can_create(name)
 		end
 	end
 	error(concat_sentence_list(get_declaration_message_error(Type.NAMESPACE, name), get_type_name_from_enum(lastNS.__meta.type).." with this name already exists"))
+end
+
+local function check_ns_nesting(name)
+	if __meta.ns ~= _G then
+		error(concat_sentence_list(get_declaration_message_error(Type.NAMESPACE, name), "Nesting namespace declarations are not allowed"))
+	end
 end
 
 local function check_type_field_absence(entityType, name, descriptor, field)
@@ -235,16 +270,15 @@ Type = {
 	CLASS = 1;
 	NAMESPACE = 2;
 
-	find = function (name)
-		local nameType = type(name)
-		if nameType ~= "string" and not (nameType == "table" and name.__meta) then
+	find = function (ref)
+		local refType = type(ref)
+		if refType ~= "string" and not (refType == "table" and ref.__meta) then
 			error "Only strings or direct references are allowed as the only argument"
 		end
-		if nameType == "string" then
-			return _G[name]
-		else
-			return name
+		if refType == "string" then
+			return resolve_type_from_string(ref)
 		end
+		return ref
 	end;
 
 	-- TODO: But it does not delete from instances
@@ -253,7 +287,7 @@ Type = {
 			return
 		end
 		if type(ref) == "string" then
-			ref = _G[ref]
+			ref = resolve_type_from_string(ref)
 		end
 		if ref == Object then
 			error "Deleting \"Object\" class is not allowed"
@@ -377,18 +411,23 @@ function extends(...)
 	return type_descriptor_handler
 end
 
--- TODO
+-- TODO: Nesting error
 function namespace(name)
 	check_type_name(Type.NAMESPACE, name)
 	check_ns_can_create(name)
+	check_ns_nesting(name)
 	local nameParts = string_split(name, ".")
 	local lastRef = _G
 	for i, part in ipairs(nameParts) do
 		if not lastRef[part] then
+			local parent = lastRef
+			if lastRef == _G then
+				parent = nil
+			end
 			lastRef[part] = {
 				__meta = {
 					name = part,
-					parent = lastRef,
+					parent = parent,
 					type = Type.NAMESPACE
 				}
 			}
@@ -399,7 +438,6 @@ function namespace(name)
 	return function (descriptor)
 		check_type_field_absence(Type.NAMESPACE, name, descriptor, "__meta")
 		check_type_field_absence(Type.NAMESPACE, name, descriptor, "__index")
-		-- TODO
 		for i, classRef in ipairs(descriptor) do
 			descriptor[classRef.__meta.name] = classRef
 			descriptor[i] = nil
@@ -504,6 +542,14 @@ class 'TypeBase' {
 			return self.ref.__meta[key]
 		else
 			return self.ref.__meta
+		end
+	end;
+
+	getName = function (self)
+		if self.ref.__meta.namespace then
+			return namespace_get_full_name(self.ref.__meta.namespace).."."..self.ref.__meta.name
+		else
+			return self.ref.__meta.name
 		end
 	end;
 
