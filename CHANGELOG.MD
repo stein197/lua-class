@@ -1,4 +1,8 @@
 # CHANGELOG
+## 3.0.0
+### Features
+- Added namespace support
+- Added extra method to Class API - `getName()`
 ## 2.3.0
 ### Features
 - Added `Object():clone()` method

@@ -1,7 +1,7 @@
 # TODO
 
 - [x] Add inheritance
-- [ ] Add namespaces
+- [x] Add namespaces
 - [x] Add try-catch-finally
 - [ ] Add import keyword
 - [x] Add `clone()` method

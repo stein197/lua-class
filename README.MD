@@ -221,6 +221,45 @@ The following operators can be overloaded:
 
 Note that index definitions have a precedence over metamethod ones, so if you extend a class that defines 
 operators and then you override them, index definitions will be taken into account.
+## Namespaces
+Namespaces can also be created by using `namespace` keyword (actually - function):
+```lua
+namespace 'system' {
+	-- Declare classes
+	class 'Print' {
+		m = function (self)
+			return self
+		end;
+	}
+	-- Declare functions
+	out = function () return 'out' end;
+}
+-- Use namespace:
+local var = system.Print()
+print(system.out())
+```
+Unlike classes, you can reuse ("redeclare") them:
+```lua
+namespace 'system' {class 'A' {--[[ ... ]]}}
+namespace 'system' {class 'B' {--[[ ... ]]}}
+```
+With namespaces you can create classes with the same name but different namespaces:
+```lua
+class 'A' {--[[ ... ]]}
+namespace 'system' {class 'A' {--[[ ... ]]}} -- No errors
+A ~= system.A
+```
+And sure, you can nest them:
+```lua
+namespace 'a.b.c' {class 'A' {--[[ ... ]]}}
+```
+But nesting declarations are not allowed, because it is harder to read and implement, use dot to create nesting:
+```lua
+namespace 'A' {
+	namespace 'B' {} -- Raises error
+}
+```
+
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
 ### Type API
@@ -241,7 +280,8 @@ Object is the toppest class that all classes derive automatically. It has the ne
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
 |Method|Description|
 |---|---|
-|`Class(<type>):getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`|
+|`Class(<type>):getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`, `namespace`|
+|`Class(<type>):getName()`|Returns full type name including namespaces delimited by dot|
 |`Class(<type>):delete()`|Completely deletes type|
 
 ## Tests
