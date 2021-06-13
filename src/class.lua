@@ -1,19 +1,3 @@
-local function table_slice(tbl, from, to)
-	local sliced = {}
-	from = from or 1
-	to = to or #tbl
-	if from < 0 then
-		from = #tbl + from + 1
-	end
-	if to < 0 then
-		to = #tbl + to + 1
-	end
-	for i = from, to do
-		table.insert(sliced, tbl[i])
-	end
-	return sliced
-end
-
 local function string_split(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
@@ -44,7 +28,7 @@ end
 
 local __meta = {
 	lastType = nil,
-	ns = nil
+	ns = _G
 }
 
 local function delete_last_type()
@@ -186,8 +170,8 @@ local function type_descriptor_handler(descriptor)
 	check_type_field_absence(meta.type, meta.name, descriptor, "__index")
 	setmetatable(descriptor, {
 		__index = __meta.lastType;
-		__call = function (...)
-			local parent = _G[meta.name]
+		__call = function (self, ...)
+			local parent = self
 			local object = setmetatable({}, {
 				__index = parent,
 				__newindex = parent["[]"] or parent.__newindex,
@@ -218,7 +202,7 @@ local function type_descriptor_handler(descriptor)
 				__shr = parent[">>"] or parent.__shr
 			})
 			if descriptor.constructor then
-				descriptor.constructor(object, table.unpack(table_slice({...}, 2)))
+				descriptor.constructor(object, table.unpack({...}))
 			end
 			object.__meta = {
 				type = Type.INSTANCE,
@@ -230,7 +214,7 @@ local function type_descriptor_handler(descriptor)
 	for parentName, parent in pairs(__meta.lastType.__meta.parents) do
 		parent.__meta.children[meta.name] = descriptor
 	end
-	_G[meta.name] = descriptor
+	__meta.ns[meta.name] = descriptor
 	__meta.lastType = nil
 end
 
@@ -355,10 +339,15 @@ Object = {
 function class(name)
 	check_type_name(Type.CLASS, name)
 	check_type_absence(Type.CLASS, name)
+	local ns = __meta.ns
+	if ns == _G then
+		ns = nil
+	end
 	local ref = setmetatable({
 		__meta = {
 			name = name,
 			type = Type.CLASS,
+			namespace = ns,
 			parents = {
 				Object = Object
 			}
@@ -366,7 +355,7 @@ function class(name)
 	}, {
 		__index = type_index
 	})
-	_G[name] = ref
+	__meta.ns[name] = ref
 	__meta.lastType = ref
 	return type_descriptor_handler
 end
@@ -407,7 +396,16 @@ function namespace(name)
 		lastRef = lastRef[part]
 	end
 	__meta.ns = lastRef
-	return type_descriptor_handler
+	return function (descriptor)
+		check_type_field_absence(Type.NAMESPACE, name, descriptor, "__meta")
+		check_type_field_absence(Type.NAMESPACE, name, descriptor, "__index")
+		-- TODO
+		for i, classRef in ipairs(descriptor) do
+			descriptor[classRef.__meta.name] = classRef
+			descriptor[i] = nil
+		end
+		__meta.ns = _G
+	end
 end
 
 function switch(variable)
