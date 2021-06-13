@@ -105,6 +105,18 @@ local function check_type_absence(entityType, name)
 	end
 end
 
+local function check_ns_can_create(name)
+	local parts = string_split(name, ".")
+	local lastNS = _G
+	for i, part in pairs(parts) do
+		local lastNS = lastNS[part]
+		if not lastNS or type(lastNS) == "table" and lastNS.__meta and lastNS.__meta.type == Type.NAMESPACE then
+			return
+		end
+	end
+	error(concat_sentence_list(get_declaration_message_error(Type.NAMESPACE, name), get_type_name_from_enum(lastNS.__meta.type).." with this name already exists"))
+end
+
 local function check_type_field_absence(entityType, name, descriptor, field)
 	if descriptor[field] then
 		delete_last_type()
@@ -379,11 +391,22 @@ end
 -- TODO
 function namespace(name)
 	check_type_name(Type.NAMESPACE, name)
+	check_ns_can_create(name)
 	local nameParts = string_split(name, ".")
-	local lastRef
-	for i, part in ipairs(name) do
-
+	local lastRef = _G
+	for i, part in ipairs(nameParts) do
+		if not lastRef[part] then
+			lastRef[part] = {
+				__meta = {
+					name = part,
+					parent = lastRef,
+					type = Type.NAMESPACE
+				}
+			}
+		end
+		lastRef = lastRef[part]
 	end
+	__meta.ns = lastRef
 	return type_descriptor_handler
 end
 
