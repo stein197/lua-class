@@ -42,11 +42,14 @@ local function table_clone(tbl)
 	return clone
 end
 
-local __lastType = nil
+local __meta = {
+	lastType = nil,
+	ns = nil
+}
 
 local function delete_last_type()
-	Type.delete(__lastType)
-	__lastType = nil
+	Type.delete(__meta.lastType)
+	__meta.lastType = nil
 end
 
 local function get_type_name_from_enum(value)
@@ -136,7 +139,7 @@ local function check_type_extend_list(entityType, name, extendList)
 			delete_last_type()
 			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Cannot extend "..get_type_name_from_enum(parent.__meta.type).." \""..parent.."\""))
 		end
-		if parent == __lastType then
+		if parent == __meta.lastType then
 			delete_last_type()
 			error(concat_sentence_list(get_declaration_message_error(entityType, name), "Class cannot extend itself"))
 		end
@@ -166,11 +169,11 @@ local function resolve_type_extend_list(entityType, name, extendList)
 end
 
 local function type_descriptor_handler(descriptor)
-	local meta = __lastType.__meta
+	local meta = __meta.lastType.__meta
 	check_type_field_absence(meta.type, meta.name, descriptor, "__meta")
 	check_type_field_absence(meta.type, meta.name, descriptor, "__index")
 	setmetatable(descriptor, {
-		__index = __lastType;
+		__index = __meta.lastType;
 		__call = function (...)
 			local parent = _G[meta.name]
 			local object = setmetatable({}, {
@@ -212,11 +215,11 @@ local function type_descriptor_handler(descriptor)
 			return object
 		end
 	})
-	for parentName, parent in pairs(__lastType.__meta.parents) do
+	for parentName, parent in pairs(__meta.lastType.__meta.parents) do
 		parent.__meta.children[meta.name] = descriptor
 	end
 	_G[meta.name] = descriptor
-	__lastType = nil
+	__meta.lastType = nil
 end
 
 local function type_index(self, key)
@@ -352,22 +355,22 @@ function class(name)
 		__index = type_index
 	})
 	_G[name] = ref
-	__lastType = ref
+	__meta.lastType = ref
 	return type_descriptor_handler
 end
 
 function extends(...)
 	local parents = {}
-	local extendList = resolve_type_extend_list(Type.CLASS, __lastType.__meta.name, {...})
-	check_type_extend_list(Type.CLASS, __lastType.__meta.name, extendList)
+	local extendList = resolve_type_extend_list(Type.CLASS, __meta.lastType.__meta.name, {...})
+	check_type_extend_list(Type.CLASS, __meta.lastType.__meta.name, extendList)
 	for i, parent in pairs(extendList) do
 		parents[parent.__meta.name] = parent
 		if not parent.__meta.children then
 			parent.__meta.children = {}
 		end
 	end
-	__lastType.__meta.parents = parents
-	setmetatable(__lastType, {
+	__meta.lastType.__meta.parents = parents
+	setmetatable(__meta.lastType, {
 		__index = type_index
 	})
 	return type_descriptor_handler
