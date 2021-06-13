@@ -25,6 +25,23 @@ local function string_split(inputstr, sep)
 	return t
 end
 
+local function table_clone(tbl)
+	if tbl.__meta and tbl.__meta.type == Type.INSTANCE then
+		return tbl:clone()
+	end
+	local clone = {}
+	for k, v in pairs(tbl) do
+		local vType = type(v)
+		local isScalar = vType == "boolean" or vType == "number" or vType == "string"
+		if isScalar then
+			clone[k] = v
+		elseif vType == "table" then
+			clone[k] = table_clone(v)
+		end
+	end
+	return clone
+end
+
 local __lastType = nil
 
 local function delete_last_type()
@@ -85,14 +102,13 @@ local function check_type_absence(entityType, name)
 	end
 end
 
-local function check_type_meta_absence(entityType, name, descriptor)
-	if descriptor.__meta then
+local function check_type_field_absence(entityType, name, descriptor, field)
+	if descriptor[field] then
 		delete_last_type()
-		error(concat_sentence_list(get_declaration_message_error(entityType, name), "Declaration of field \"__meta\" is not allowed"))
+		error(concat_sentence_list(get_declaration_message_error(entityType, name), "Declaration of field \""..field.."\" is not allowed"))
 	end
 end
 
--- TODO
 local function check_type_not_deriving(entityType, name, typeA, typeB)
 	local parents = {
 		typeA
@@ -113,7 +129,6 @@ local function check_type_not_deriving(entityType, name, typeA, typeB)
 	end
 end
 
--- TODO: Check if child derives already derived class (like C extends A -> D extends C,A)
 local function check_type_extend_list(entityType, name, extendList)
 	for i = 1, #extendList do
 		local parent = extendList[i]
@@ -152,12 +167,40 @@ end
 
 local function type_descriptor_handler(descriptor)
 	local meta = __lastType.__meta
-	check_type_meta_absence(meta.type, meta.name, descriptor)
+	check_type_field_absence(meta.type, meta.name, descriptor, "__meta")
+	check_type_field_absence(meta.type, meta.name, descriptor, "__index")
 	setmetatable(descriptor, {
 		__index = __lastType;
 		__call = function (...)
+			local parent = _G[meta.name]
 			local object = setmetatable({}, {
-				__index = _G[meta.name]
+				__index = parent,
+				__newindex = parent["[]"] or parent.__newindex,
+				__call = parent["()"] or parent.__call,
+				__tostring = parent.__tostring,
+				__concat = parent[".."] or parent.__concat,
+				__metatable = parent.__metatable,
+				__mode = parent.__mode,
+				__gc = parent.__gc,
+				__len = parent["#"] or parent.__len,
+				__pairs = parent.__pairs,
+				__ipairs = parent.__ipairs,
+				__add = parent["+"] or parent.__add,
+				__sub = parent["-"] or parent.__sub,
+				__mul = parent["*"] or parent.__mul,
+				__div = parent["/"] or parent.__div,
+				__pow = parent["^"] or parent.__pow,
+				__mod = parent["%"] or parent.__mod,
+				__idiv = parent["//"] or parent.__idiv,
+				__eq = parent["=="] or parent.__eq,
+				__lt = parent["<"] or parent.__lt,
+				__le = parent["<="] or parent.__le,
+				__band = parent["&"] or parent.__band,
+				__bor = parent["|"] or parent.__bor,
+				__bxor = parent["~"] or parent.__bxor,
+				__bnot = parent["not"] or parent.__bnot,
+				__shl = parent["<<"] or parent.__shl,
+				__shr = parent[">>"] or parent.__shr
 			})
 			if descriptor.constructor then
 				descriptor.constructor(object, table.unpack(table_slice({...}, 2)))
@@ -275,6 +318,20 @@ Object = {
 		return #parents > 0
 	end;
 
+	clone = function (self)
+		local clone = setmetatable({}, getmetatable(self))
+		for k, v in pairs(self) do
+			local vType = type(v)
+			local isScalar = vType == "boolean" or vType == "number" or vType == "string"
+			if isScalar or k == "__meta" then
+				clone[k] = v
+			elseif vType == "table" then
+				clone[k] = table_clone(v)
+			end
+		end
+		return clone
+	end;
+
 	getClass = function (self)
 		return self.__meta.class
 	end;
@@ -369,7 +426,7 @@ function try(f)
 end
 
 function default() end
-function null() end -- TODO: Delete
+function null() end -- TODO: Delete?
 
 class 'TryCatchFinally' {
 

@@ -1,4 +1,10 @@
 # CHANGELOG
+## 2.3.0
+### Features
+- Added `Object():clone()` method
+## 2.2.0
+### Features
+- Added operator overloading feature
 ## 2.1.0
 ### Features
 - Added try-catch-finally clause

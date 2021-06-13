@@ -104,6 +104,9 @@ local var = switch "b" {
 	a = 1;
 	b = 2;
 	c = 3;
+	d = function ()
+		return 4; -- If you wish you can also use function blocks and return values from them
+	end;
 }
 print(var) -- Prints "2"
 ```
@@ -172,6 +175,52 @@ try {
 	end
 }
 ```
+## Operator overloading
+Since lua supports operator overloading, you can define own implementations for operators as usual metamethod name (as lua provides) or by explicit definintion as corresponding index:
+```lua
+class 'A' {
+	__add = function (self, value)
+		return "addition "..value
+	end;
+	["-"] = function (self, value)
+		return "substraction "..value
+	end;
+}
+A() + 1 --> "addition 1"
+A() - 1 --> "substraction 1"
+```
+The following operators can be overloaded:
+|Metamethod|Index name|
+|---|---|
+|`__newindex`|`[]`|
+|`__call`|`()`|
+|`__tostring`||
+|`__concat`|`..`|
+|`__metatable`||
+|`__mode`||
+|`__gc`||
+|`__len`|`#`|
+|`__pairs`||
+|`__ipairs`||
+|`__add`|`+`|
+|`__sub`|`-`|
+|`__mul`|`*`|
+|`__div`|`/`|
+|`__pow`|`^`|
+|`__mod`|`%`|
+|`__idiv`|`//`|
+|`__eq`|`==`|
+|`__lt`|`<`|
+|`__le`|`<=`|
+|`__band`|`&`|
+|`__bor`|`|`|
+|`__bxor`|`~`|
+|`__bnot`|`not`|
+|`__bshl`|`<<`|
+|`__bshr`|`>>`|
+
+Note that index definitions have a precedence over metamethod ones, so if you extend a class that defines 
+operators and then you override them, index definitions will be taken into account.
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
 ### Type API
@@ -186,6 +235,7 @@ Object is the toppest class that all classes derive automatically. It has the ne
 |---|---|
 |`Object():getClass()`|Returns reference to a class that created current instance|
 |`Object():instanceof(<class>)`|Returns true if the object is instance of supplied class. Class name can be either string or direct reference to a class|
+|`Object():clone()`|Makes deep object clone. Deeply clones table references and object instance references|
 
 ### Class wrapper API
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
@@ -193,3 +243,6 @@ There is also special Class API. This package defines own class `Class` which ca
 |---|---|
 |`Class(<type>):getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`|
 |`Class(<type>):delete()`|Completely deletes type|
+
+## Tests
+To run tests, call from terminal `.\test.bat` for Windows and `./test.sh` for Linux
