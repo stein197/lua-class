@@ -411,7 +411,6 @@ function extends(...)
 	return type_descriptor_handler
 end
 
--- TODO: Nesting error
 function namespace(name)
 	check_type_name(Type.NAMESPACE, name)
 	check_ns_can_create(name)
