@@ -216,8 +216,8 @@ The following operators can be overloaded:
 |`__bor`|`|`|
 |`__bxor`|`~`|
 |`__bnot`|`not`|
-|`__bshl`|`<<`|
-|`__bshr`|`>>`|
+|`__shl`|`<<`|
+|`__shr`|`>>`|
 
 Note that index definitions have a precedence over metamethod ones, so if you extend a class that defines 
 operators and then you override them, index definitions will be taken into account.
