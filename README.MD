@@ -286,3 +286,4 @@ There is also special Class API. This package defines own class `Class` which ca
 
 ## Tests
 To run tests, call from terminal `.\test.bat` for Windows and `./test.sh` for Linux
+You can pass an argument to tests to define memory test iterations count like this - `test 1024`

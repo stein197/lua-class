@@ -12,5 +12,5 @@
 - [x] Add ability to call methods from inside constructor
 - [x] Add operator overloading methods
 - [ ] Add `__newindex`, `__gc`, `__mode`, `__ipairs` overloading
-- [ ] Important - save instance prototype to parent.__meta.__proto - it'll decrease the number of tables in memory
+- [x] Important - save instance prototype to parent.__meta.__proto - it'll decrease the number of tables in memory
 - [ ] Merge `Object():clone()` with `table_clone()` (to remove duplicate code)
