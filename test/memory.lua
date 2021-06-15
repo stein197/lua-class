@@ -33,5 +33,9 @@ local iterationsCount = tonumber(arg[1]) or 1000
 for i = 0, iterationsCount do
 	table.insert(cache, TestingMemoryUsage())
 end
-print("Memory test iterations count: "..iterationsCount)
-print("Memory usage: "..(collectgarbage("count") - initialSize).."KB")
+print("Instantiation memory usage for "..iterationsCount.." iterations: "..(collectgarbage("count") - initialSize).."KB")
+local initialSize = collectgarbage("count")
+for i = 0, iterationsCount do
+	class ('MemoryTest'..tostring(i)) {}
+end
+print("Class definition memory usage for "..iterationsCount.." iterations: "..(collectgarbage("count") - initialSize).."KB")

@@ -1,4 +1,7 @@
 # CHANGELOG
+## 3.0.2 - 2021-06-15
+### Changed
+- Class definitions. Memory usage reduced
 ## 3.0.1 - 2021-06-15
 ### Added
 - Memory usage test

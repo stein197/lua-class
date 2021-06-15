@@ -199,55 +199,59 @@ local function resolve_type_extend_list(entityType, name, extendList)
 	return parentList
 end
 
+local function type_constructor(self, ...)
+	if not self.__meta.__proto then
+		self.__meta.__proto = {
+			__index = self,
+			__newindex = self["[]"] or self.__newindex,
+			__call = self["()"] or self.__call,
+			__tostring = self.__tostring,
+			__concat = self[".."] or self.__concat,
+			__metatable = self.__metatable,
+			__mode = self.__mode,
+			__gc = self.__gc,
+			__len = self["#"] or self.__len,
+			__pairs = self.__pairs,
+			__ipairs = self.__ipairs,
+			__add = self["+"] or self.__add,
+			__sub = self["-"] or self.__sub,
+			__mul = self["*"] or self.__mul,
+			__div = self["/"] or self.__div,
+			__pow = self["^"] or self.__pow,
+			__mod = self["%"] or self.__mod,
+			__idiv = self["//"] or self.__idiv,
+			__eq = self["=="] or self.__eq,
+			__lt = self["<"] or self.__lt,
+			__le = self["<="] or self.__le,
+			__band = self["&"] or self.__band,
+			__bor = self["|"] or self.__bor,
+			__bxor = self["~"] or self.__bxor,
+			__bnot = self["not"] or self.__bnot,
+			__shl = self["<<"] or self.__shl,
+			__shr = self[">>"] or self.__shr
+		}
+	end
+	local object = setmetatable({}, self.__meta.__proto)
+	if self.constructor then
+		self.constructor(object, table.unpack({...}))
+	end
+	object.__meta = {
+		type = Type.INSTANCE,
+		class = self
+	}
+	return object
+end
+
 local function type_descriptor_handler(descriptor)
 	local meta = __meta.lastType.__meta
+	__meta.lastTypeDescriptor = descriptor
 	check_type_field_absence(meta.type, meta.name, descriptor, "__meta")
 	check_type_field_absence(meta.type, meta.name, descriptor, "__index")
 	setmetatable(descriptor, {
 		__index = __meta.lastType;
-		__call = function (self, ...)
-			if not self.__meta.__proto then
-				self.__meta.__proto = {
-					__index = self,
-					__newindex = self["[]"] or self.__newindex,
-					__call = self["()"] or self.__call,
-					__tostring = self.__tostring,
-					__concat = self[".."] or self.__concat,
-					__metatable = self.__metatable,
-					__mode = self.__mode,
-					__gc = self.__gc,
-					__len = self["#"] or self.__len,
-					__pairs = self.__pairs,
-					__ipairs = self.__ipairs,
-					__add = self["+"] or self.__add,
-					__sub = self["-"] or self.__sub,
-					__mul = self["*"] or self.__mul,
-					__div = self["/"] or self.__div,
-					__pow = self["^"] or self.__pow,
-					__mod = self["%"] or self.__mod,
-					__idiv = self["//"] or self.__idiv,
-					__eq = self["=="] or self.__eq,
-					__lt = self["<"] or self.__lt,
-					__le = self["<="] or self.__le,
-					__band = self["&"] or self.__band,
-					__bor = self["|"] or self.__bor,
-					__bxor = self["~"] or self.__bxor,
-					__bnot = self["not"] or self.__bnot,
-					__shl = self["<<"] or self.__shl,
-					__shr = self[">>"] or self.__shr
-				}
-			end
-			local object = setmetatable({}, self.__meta.__proto)
-			if descriptor.constructor then
-				descriptor.constructor(object, table.unpack({...}))
-			end
-			object.__meta = {
-				type = Type.INSTANCE,
-				class = descriptor
-			}
-			return object
-		end
+		__call = type_constructor
 	})
+	__meta.lastTypeDescriptor = nil
 	for parentName, parent in pairs(__meta.lastType.__meta.parents) do
 		parent.__meta.children[meta.name] = descriptor
 	end
