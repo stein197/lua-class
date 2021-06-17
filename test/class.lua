@@ -1,14 +1,11 @@
 LuaUnit = dofile "lib/luaunit.lua"
 dofile "src/class.lua"
-dofile "test/TestClass.lua"
-dofile "test/TestMeta.lua"
-dofile "test/TestInheritance.lua"
-dofile "test/TestSwitch.lua"
-dofile "test/TestMultipleInheritance.lua"
-dofile "test/TestTryCatchFinally.lua"
-dofile "test/TestNamespace.lua"
-dofile "test/TestOperatorOverloading.lua"
-dofile "test/TestClone.lua"
+-- TODO: For unix
+for file in io.popen("dir test /a:-d /b"):lines() do
+	if file:match("^Test%w+%.lua$") then
+		dofile("test/"..file)
+	end
+end
 local runner = LuaUnit.LuaUnit.new()
 runner:setOutputType("text")
 os.exit(runner:runSuite())
