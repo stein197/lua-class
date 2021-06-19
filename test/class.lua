@@ -1,10 +1,13 @@
 LuaUnit = dofile "lib/luaunit.lua"
 dofile "src/class.lua"
--- TODO: For unix
-for file in io.popen("dir test /a:-d /b"):lines() do
-	if file:match("^Test%w+%.lua$") then
-		dofile("test/"..file)
-	end
+local command
+if package.config:sub(1, 1) == "/" then
+	command = "ls test | grep \"^Test.*\\.lua$\""
+else
+	command = "dir test /a:-d /b | findstr \"^Test.*\\.lua$\""
+end
+for file in io.popen(command):lines() do
+	dofile("test/"..file)
 end
 local runner = LuaUnit.LuaUnit.new()
 runner:setOutputType("text")
