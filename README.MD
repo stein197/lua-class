@@ -216,8 +216,8 @@ The following operators can be overloaded:
 |`__bor`|`|`|
 |`__bxor`|`~`|
 |`__bnot`|`not`|
-|`__bshl`|`<<`|
-|`__bshr`|`>>`|
+|`__shl`|`<<`|
+|`__shr`|`>>`|
 
 Note that index definitions have a precedence over metamethod ones, so if you extend a class that defines 
 operators and then you override them, index definitions will be taken into account.
@@ -286,3 +286,4 @@ There is also special Class API. This package defines own class `Class` which ca
 
 ## Tests
 To run tests, call from terminal `.\test.bat` for Windows and `./test.sh` for Linux
+You can pass an argument to tests to define memory test iterations count like this - `test 1024`

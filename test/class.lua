@@ -1,14 +1,14 @@
 LuaUnit = dofile "lib/luaunit.lua"
 dofile "src/class.lua"
-dofile "test/TestClass.lua"
-dofile "test/TestMeta.lua"
-dofile "test/TestInheritance.lua"
-dofile "test/TestSwitch.lua"
-dofile "test/TestMultipleInheritance.lua"
-dofile "test/TestTryCatchFinally.lua"
-dofile "test/TestNamespace.lua"
-dofile "test/TestOperatorOverloading.lua"
-dofile "test/TestClone.lua"
+local command
+if package.config:sub(1, 1) == "/" then
+	command = "ls test | grep \"^Test.*\\.lua$\""
+else
+	command = "dir test /a:-d /b | findstr \"^Test.*\\.lua$\""
+end
+for file in io.popen(command):lines() do
+	dofile("test/"..file)
+end
 local runner = LuaUnit.LuaUnit.new()
 runner:setOutputType("text")
 os.exit(runner:runSuite())

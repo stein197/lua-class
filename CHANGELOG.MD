@@ -1,4 +1,13 @@
 # CHANGELOG
+## 3.0.2 - 2021-06-15
+### Changed
+- Class definitions. Memory usage reduced
+## 3.0.1 - 2021-06-15
+### Added
+- Memory usage test
+- Parameter to test scripts
+### Changed
+- Object instantiation. Now object prototypes are saved in `__meta.__proto` entry which reduces the amount of memory usage
 ## 3.0.0 - 2021-06-13
 ### Added
 - Namespace support
