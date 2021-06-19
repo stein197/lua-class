@@ -1,6 +1,10 @@
 # Lua OOP emulator
 ## Basic concepts
-Sometimes there is a need to use classes in language that does not support them at all. Fortunately, lua allows us to use some sort of object-oriented paradigm by its dynamic nature. This simple lua package allows to use object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project and use it like this:
+Sometimes there is a need to use classes in language that does not support them at all. Fortunately, lua allows us to use some sort of object-oriented paradigm by its dynamic nature. This simple lua package allows to use object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project or you can install it via [LuaRocks](https://luarocks.org/):
+```
+luarocks install lua-class
+```
+and use it like this:
 ```lua
 class "A" {
 
