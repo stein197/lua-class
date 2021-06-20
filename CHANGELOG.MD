@@ -1,4 +1,10 @@
 # CHANGELOG
+## 3.0.3 - 2021-06-20
+### Added
+- Apache 2 license
+- Rockspec file for LuaRocks
+### Fixed
+- Memory tests didn't execute on unix
 ## 3.0.2 - 2021-06-15
 ### Changed
 - Class definitions. Memory usage reduced
@@ -47,4 +53,4 @@
 ### Added
 - `Object.getMeta()` method to get class meta info
 ## 1.0.0 - 2021-05-17
-Release version. See README.md
+Release
