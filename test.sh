@@ -4,4 +4,4 @@ then
 	echo "Lua is not installed"
 	exit
 fi
-clear && lua test/class.lua --verbose && lua test/memory.lua $1
+reset && lua test/class.lua --verbose && lua test/memory.lua $1
