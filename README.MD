@@ -1,6 +1,20 @@
-# Lua OOP emulator
+# Lua OOP library
 ## Basic concepts
-Sometimes there is a need to use classes in language that does not support them at all. Fortunately, lua allows us to use some sort of object-oriented paradigm by its dynamic nature. This simple lua package allows to use object-oriented paradigm by using usual keyword `class`. Just import `class.lua` in project or you can install it via [LuaRocks](https://luarocks.org/):
+Sometimes there is a need to use classes in language that does not support them at all. Fortunately, lua allows us to use some sort of object-oriented paradigm by its dynamic nature. This simple lua package allows to use object-oriented paradigm by using usual keyword `class`.
+## Table of contents
+- [Basic usage](#basic-usage)
+- [Inheritance](#inheritance)
+- [Multiple inheritance](#multiple-inheritance)
+- [Namespaces](#namespaces)
+- [Operator overloading](#operator-overloading)
+- [Statements](#statements)
+	- [Try-catch-finally](#try-catch-finally)
+	- [Switch](#switch)
+- [API](#api)
+- [Testing](#testing)
+
+## Basic usage
+Import `class.lua` in project or you can install it via [LuaRocks](https://luarocks.org/):
 ```
 luarocks install lua-class
 ```
@@ -88,7 +102,96 @@ class 'B' extends 'A'
 class 'C' extends (B, A) {} -- Error is here because class A is already derived in B
 ```
 
-## Switch statement
+## Namespaces
+Namespaces can also be created by using `namespace` keyword (actually - function):
+```lua
+namespace 'system' {
+	-- Declare classes
+	class 'Print' {
+		m = function (self)
+			return self
+		end;
+	}
+	-- Declare functions
+	out = function () return 'out' end;
+}
+-- Use namespace:
+local var = system.Print()
+print(system.out())
+```
+Unlike classes, you can reuse ("redeclare") them:
+```lua
+namespace 'system' {class 'A' {--[[ ... ]]}}
+namespace 'system' {class 'B' {--[[ ... ]]}}
+```
+With namespaces you can create classes with the same name but different namespaces:
+```lua
+class 'A' {--[[ ... ]]}
+namespace 'system' {class 'A' {--[[ ... ]]}} -- No errors
+A ~= system.A
+```
+And sure, you can nest them:
+```lua
+namespace 'a.b.c' {class 'A' {--[[ ... ]]}}
+```
+But nesting declarations are not allowed, because it is harder to read and implement, use dot to create nesting:
+```lua
+namespace 'A' {
+	namespace 'B' {} -- Raises error
+}
+```
+
+## Operator overloading
+Since lua supports operator overloading, you can define own implementations for operators as usual metamethod name (as lua provides) or by explicit definintion as corresponding index:
+```lua
+class 'A' {
+	__add = function (self, value)
+		return "addition "..value
+	end;
+	["-"] = function (self, value)
+		return "substraction "..value
+	end;
+}
+A() + 1 --> "addition 1"
+A() - 1 --> "substraction 1"
+```
+The following operators can be overloaded:
+|Metamethod|Index name|
+|---|---|
+|`__newindex`|`[]`|
+|`__call`|`()`|
+|`__tostring`||
+|`__concat`|`..`|
+|`__metatable`||
+|`__mode`||
+|`__gc`||
+|`__len`|`#`|
+|`__pairs`||
+|`__ipairs`||
+|`__add`|`+`|
+|`__sub`|`-`|
+|`__mul`|`*`|
+|`__div`|`/`|
+|`__pow`|`^`|
+|`__mod`|`%`|
+|`__idiv`|`//`|
+|`__eq`|`==`|
+|`__lt`|`<`|
+|`__le`|`<=`|
+|`__band`|`&`|
+|`__bor`|`|`|
+|`__bxor`|`~`|
+|`__bnot`|`not`|
+|`__shl`|`<<`|
+|`__shr`|`>>`|
+
+> NOTE: Index definitions have a precedence over metamethod ones, so if you extend a class that defines 
+operators and then you override them, index definitions will be taken into account.
+
+## Statements
+The package also comes up with a few pretty familiar statements that do not exist in Lua but do in other languages.
+
+### Switch
 You can create switch-like statements and even expressions using function `switch`:
 ```lua
 local var = "b"
@@ -114,7 +217,8 @@ local var = switch "b" {
 }
 print(var) -- Prints "2"
 ```
-## Try-catch-finally statement
+
+### Try-catch-finally
 The library provies pretty standard try-catch-finally feature:
 ```lua
 try(function ()
@@ -179,90 +283,6 @@ try {
 	end
 }
 ```
-## Operator overloading
-Since lua supports operator overloading, you can define own implementations for operators as usual metamethod name (as lua provides) or by explicit definintion as corresponding index:
-```lua
-class 'A' {
-	__add = function (self, value)
-		return "addition "..value
-	end;
-	["-"] = function (self, value)
-		return "substraction "..value
-	end;
-}
-A() + 1 --> "addition 1"
-A() - 1 --> "substraction 1"
-```
-The following operators can be overloaded:
-|Metamethod|Index name|
-|---|---|
-|`__newindex`|`[]`|
-|`__call`|`()`|
-|`__tostring`||
-|`__concat`|`..`|
-|`__metatable`||
-|`__mode`||
-|`__gc`||
-|`__len`|`#`|
-|`__pairs`||
-|`__ipairs`||
-|`__add`|`+`|
-|`__sub`|`-`|
-|`__mul`|`*`|
-|`__div`|`/`|
-|`__pow`|`^`|
-|`__mod`|`%`|
-|`__idiv`|`//`|
-|`__eq`|`==`|
-|`__lt`|`<`|
-|`__le`|`<=`|
-|`__band`|`&`|
-|`__bor`|`|`|
-|`__bxor`|`~`|
-|`__bnot`|`not`|
-|`__shl`|`<<`|
-|`__shr`|`>>`|
-
-Note that index definitions have a precedence over metamethod ones, so if you extend a class that defines 
-operators and then you override them, index definitions will be taken into account.
-## Namespaces
-Namespaces can also be created by using `namespace` keyword (actually - function):
-```lua
-namespace 'system' {
-	-- Declare classes
-	class 'Print' {
-		m = function (self)
-			return self
-		end;
-	}
-	-- Declare functions
-	out = function () return 'out' end;
-}
--- Use namespace:
-local var = system.Print()
-print(system.out())
-```
-Unlike classes, you can reuse ("redeclare") them:
-```lua
-namespace 'system' {class 'A' {--[[ ... ]]}}
-namespace 'system' {class 'B' {--[[ ... ]]}}
-```
-With namespaces you can create classes with the same name but different namespaces:
-```lua
-class 'A' {--[[ ... ]]}
-namespace 'system' {class 'A' {--[[ ... ]]}} -- No errors
-A ~= system.A
-```
-And sure, you can nest them:
-```lua
-namespace 'a.b.c' {class 'A' {--[[ ... ]]}}
-```
-But nesting declarations are not allowed, because it is harder to read and implement, use dot to create nesting:
-```lua
-namespace 'A' {
-	namespace 'B' {} -- Raises error
-}
-```
 
 ## API
 This library provides simple API to manage hierarchies or to retrieve extra info.
@@ -288,6 +308,6 @@ There is also special Class API. This package defines own class `Class` which ca
 |`Class(<type>):getName()`|Returns full type name including namespaces delimited by dot|
 |`Class(<type>):delete()`|Completely deletes type|
 
-## Tests
+## Testing
 To run tests, call from terminal `.\test.bat` for Windows and `./test.sh` for Linux
 You can pass an argument to tests to define memory test iterations count like this - `test 1024`
