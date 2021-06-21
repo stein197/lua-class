@@ -3,7 +3,7 @@
 - [x] Add inheritance
 - [x] Add namespaces
 - [x] Add try-catch-finally
-- [ ] Add import keyword (configure package.path, add paths like "package.inner.*")
+- [x] Add import keyword (configure package.path, add paths like "package.inner.*")
 - [x] Add `clone()` method
 - [x] Optionally add an ability to get class name
 - [x] Add fallback for switch

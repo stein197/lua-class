@@ -6,6 +6,7 @@ Sometimes there is a need to use classes in language that does not support them 
 - [Inheritance](#inheritance)
 - [Multiple inheritance](#multiple-inheritance)
 - [Namespaces](#namespaces)
+- [Import](#import)
 - [Operator overloading](#operator-overloading)
 - [Statements](#statements)
 	- [Try-catch-finally](#try-catch-finally)
@@ -139,6 +140,13 @@ But nesting declarations are not allowed, because it is harder to read and imple
 namespace 'A' {
 	namespace 'B' {} -- Raises error
 }
+```
+
+## Import
+It is pretty common to represent namespaces as filesystem directories and classes as separate source code files. So the `import` function relies on this convention. You only needis to specify project root path in `package.path` and use imports in java-like style:
+```lua
+import "system.io.File" -- Import single class located in system/io/File.lua
+import "system.draw.*" -- Import all classes located in system/draw
 ```
 
 ## Operator overloading

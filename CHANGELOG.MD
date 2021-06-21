@@ -1,4 +1,7 @@
 # CHANGELOG
+## 3.1.0 -
+### Added
+- `import` function
 ## 3.0.3 - 2021-06-20
 ### Added
 - Apache 2 license
