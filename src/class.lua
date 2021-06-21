@@ -1,3 +1,11 @@
+do
+	local cwdResult = io.popen("cd"):lines()
+	local directorySeparator = package.config:sub(1, 1)
+	for line in cwdResult do
+		package.path = line..directorySeparator.."src"..directorySeparator.."?.lua;"..package.path
+	end
+end
+
 local function string_split(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
@@ -452,8 +460,9 @@ function namespace(name)
 	end
 end
 
--- TODO
-function import (name)
+-- TODO: asterisk *
+function import(name)
+	require(name)
 end
 
 function switch(variable)

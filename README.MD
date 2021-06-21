@@ -143,11 +143,20 @@ namespace 'A' {
 ```
 
 ## Import
-It is pretty common to represent namespaces as filesystem directories and classes as separate source code files. So the `import` function relies on this convention. You only needis to specify project root path in `package.path` and use imports in java-like style:
+It is pretty common to represent namespaces as filesystem directories and classes as separate source code files. So the `import` function relies on this convention. Example of usage:
 ```lua
 import "system.io.File" -- Import single class located in system/io/File.lua
 import "system.draw.*" -- Import all classes located in system/draw
 ```
+Pretty reminds of java, does not it?
+When you load the main `class.lua`, it appends `$(pwd)/src` to `package.path`. So if you import class like "system.File" and your current directory looks like this:
+```
+project
+|- src
+   |- system
+      |- File.lua
+```
+then the library will look for a class in `src` directory. But you can define your own path in `package.path`
 
 ## Operator overloading
 Since lua supports operator overloading, you can define own implementations for operators as usual metamethod name (as lua provides) or by explicit definintion as corresponding index:
