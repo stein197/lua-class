@@ -452,6 +452,10 @@ function namespace(name)
 	end
 end
 
+-- TODO
+function import (name)
+end
+
 function switch(variable)
 	return function (map)
 		for case, value in pairs(map) do
