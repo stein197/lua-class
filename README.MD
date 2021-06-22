@@ -149,14 +149,20 @@ import "system.io.File" -- Import single class located in system/io/File.lua
 import "system.draw.*" -- Import all classes located in system/draw
 ```
 Pretty reminds of java, does not it?
-When you load the main `class.lua`, it appends `$(pwd)/src` to `package.path`. So if you import class like "system.File" and your current directory looks like this:
+When you use import statement, it looks for files in `src` directory first. So if you import class like "system.File" and your current directory looks like this:
 ```
 project
 |- src
    |- system
       |- File.lua
 ```
-then the library will look for a class in `src` directory. But you can define your own path in `package.path`
+then the library will include `./src/system/File.lua` file. But you can define your own path by using `Type.setBasePath(<path>)` method:
+```lua
+Type.setBasePath("project/scripts")
+import "system.File" -- Includes ./project/scripts/system/File.lua file
+import "ns.*" -- Includes all *.lua files located in ./project/scripts/ns directory
+```
+> NOTE: If you want to replace the default src folder to different one, you MUST call this method FIRST before using all import statements
 
 ## Operator overloading
 Since lua supports operator overloading, you can define own implementations for operators as usual metamethod name (as lua provides) or by explicit definintion as corresponding index:
@@ -308,6 +314,7 @@ This library provides simple API to manage hierarchies or to retrieve extra info
 |---|---|
 |`Type.find(<type>)`|Finds and returns type by its name. Nil if type wasn't found|
 |`Type.delete(<type>)`|Completely deletes type from hierarchy and global scope. If type has child types, then they are going to die too|
+|`Type.setBasePath(<path>)`|Includes specified path in `package.path` so all import statements will look for this path first|
 
 ### Object class API
 Object is the toppest class that all classes derive automatically. It has the next useful methods:
@@ -321,7 +328,7 @@ Object is the toppest class that all classes derive automatically. It has the ne
 There is also special Class API. This package defines own class `Class` which can be used to retrieve info about classes. To use it, pass any class to the constructor like `local aInfo = Class(A)`. This class contains next methods:
 |Method|Description|
 |---|---|
-|`Class(<type>):getMeta(<key>)`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`, `namespace`|
+|`Class(<type>):getMeta([<key>])`|Returns metainfo about class as a table. If `key` is specified then the specified field is returned. The returned table contains fields `name`, `parents`, `type`, `children`, `namespace`|
 |`Class(<type>):getName()`|Returns full type name including namespaces delimited by dot|
 |`Class(<type>):delete()`|Completely deletes type|
 

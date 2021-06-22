@@ -1,8 +1,3 @@
-do
-	local directorySeparator = package.config:sub(1, 1)
-	package.path = "."..directorySeparator.."src"..directorySeparator.."?.lua;"..package.path
-end
-
 local function string_split(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
@@ -31,9 +26,15 @@ local function table_clone(tbl)
 	return clone
 end
 
+local packageConfig = string_split(package.config, "\n")
+local directorySeparator = packageConfig[1]
+local pathDelimiter = packageConfig[2]
+local pathSub = packageConfig[3]
+
 local __meta = {
 	lastType = nil,
-	ns = _G
+	ns = _G,
+	path = nil
 }
 
 local function namespace_get_full_name(ns)
@@ -321,6 +322,23 @@ Type = {
 		end
 		_G[typeName] = nil
 	end;
+
+	--- Sets base search path for imports
+	setBasePath = function (path)
+		if __meta.path then
+			local pathParts = string_split(package.path, pathDelimiter)
+			local resultPath = {}
+			local oldPath = __meta.path..directorySeparator..pathSub..".lua"
+			for i = 1, #pathParts do
+				if pathParts[i] ~= oldPath then
+					table.insert(resultPath, pathParts[i])
+				end
+			end
+			package.path = table.concat(resultPath, pathDelimiter)
+		end
+		__meta.path = path
+		package.path = path..directorySeparator..pathSub..".lua"..pathDelimiter..package.path
+	end;
 }
 
 Object = {
@@ -457,9 +475,25 @@ function namespace(name)
 	end
 end
 
--- TODO: asterisk *
 function import(name)
-	require(name)
+	if name:sub(#name, #name) == "*" then
+		local parts = string_split(name, ".")
+		parts[#parts] = nil
+		local path = table.concat(parts, directorySeparator)
+		local result
+		if directorySeparator == "/" then
+			result = io.popen("ls "..__meta.path.."/"..path):lines()
+		else
+			result = io.popen("dir "..__meta.path.."\\"..path.." /a:-d /b | findstr \"\\.lua$\""):lines()
+		end
+		local ns = table.concat(parts, ".")
+		for fileName in result do
+			local fileBase = fileName:gsub("%.lua$", "")
+			require(ns.."."..fileBase)
+		end
+	else
+		require(name)
+	end
 end
 
 function switch(variable)
@@ -573,3 +607,5 @@ class 'Class' {
 		Type.delete(self)
 	end;
 }
+
+Type.setBasePath("src")

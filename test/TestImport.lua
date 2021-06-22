@@ -22,4 +22,6 @@ TestImport = {
 		system.File():getDir():instanceof(system.Directory)
 		graphics.Point()
 	end;
+
+	["test: Import with asterisk imports all files in a directory"] = function () error "Not implemented" end; -- TODO
 }
