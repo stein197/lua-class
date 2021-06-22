@@ -8,7 +8,7 @@ TestImport = {
 		if ds == "/" then
 			q = "\\"..q
 			esc = "\""
-		end		
+		end
 		os.execute("mkdir src"..ds.."system")
 		os.execute("mkdir src"..ds.."graphics")
 		os.execute("mkdir src"..ds.."all")
