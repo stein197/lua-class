@@ -539,7 +539,7 @@ class 'TryCatchFinally' {
 	end;
 }
 
-class 'TypeBase' {
+class 'Class' {
 
 	ref = nil;
 
@@ -573,5 +573,3 @@ class 'TypeBase' {
 		Type.delete(self)
 	end;
 }
-
-class "Class" extends 'TypeBase' {}
