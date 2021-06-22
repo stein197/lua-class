@@ -1,9 +1,6 @@
 do
-	local cwdResult = io.popen("cd"):lines()
 	local directorySeparator = package.config:sub(1, 1)
-	for line in cwdResult do
-		package.path = line..directorySeparator.."src"..directorySeparator.."?.lua;"..package.path
-	end
+	package.path = "."..directorySeparator.."src"..directorySeparator.."?.lua;"..package.path
 end
 
 local function string_split(inputstr, sep)
