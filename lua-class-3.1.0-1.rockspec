@@ -1,6 +1,6 @@
 rockspec_format = "3.0"
 package = "lua-class"
-version = "3.0.2-1"
+version = "3.1.0-1"
 source = {
 	url = "git+https://github.com/stein197/lua-class"
 }
