@@ -314,7 +314,7 @@ This library provides simple API to manage hierarchies or to retrieve extra info
 |---|---|
 |`Type.find(<type>)`|Finds and returns type by its name. Nil if type wasn't found|
 |`Type.delete(<type>)`|Completely deletes type from hierarchy and global scope. If type has child types, then they are going to die too|
-|`Type.setBasePath(<path>)`|Includes specified path in `package.path` so all import statements will look for this path first|
+|`Type.setBasePath(<path>)`|Includes specified path in `package.path` so all import statements will look for this path first. Calling this method overrides previous base path. It's done this way because if we are using asterisk imports and the overriding at the same time, then the asterisk import will look for files in all listed directories and it could cause "not found" error|
 
 ### Object class API
 Object is the toppest class that all classes derive automatically. It has the next useful methods:
