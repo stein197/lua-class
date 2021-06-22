@@ -1,5 +1,5 @@
 # CHANGELOG
-## 3.1.0 -
+## 3.1.0 - 2021-06-22
 ### Added
 - `import` function
 - `Type.setBasePath()` method to rewrite file search path
