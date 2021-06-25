@@ -3,6 +3,8 @@
 ### Added
 - `import` function
 - `Type.setBasePath()` method to rewrite file search path
+### Removed
+- `TypeBase` class
 ## [3.0.3](../../compare/3.0.2...3.0.3) - 2021-06-20
 ### Added
 - Apache 2 license
