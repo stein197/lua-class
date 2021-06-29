@@ -1,5 +1,5 @@
 rockspec_format = "3.0"
-package = "lua-class"
+package = "luass"
 version = "3.1.0-1"
 source = {
 	url = "git+https://github.com/stein197/lua-class"
