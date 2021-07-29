@@ -1,4 +1,7 @@
 # CHANGELOG
+## [Unreleased]
+- Getters and setters (via `get 'property' function() ... end`)
+
 ## [3.1.0](../../compare/3.0.3...3.1.0) - 2021-06-22
 ### Added
 - `import` function
