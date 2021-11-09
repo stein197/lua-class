@@ -2,6 +2,7 @@
 ## [Unreleased]
 - Getters and setters (via `get 'property' function() ... end`)
 - Add ternary function operator (via ()['?'](true)[':'](false))
+- Add private/protected/public keys via closures and _ENV variable
 
 ## [3.1.0](../../compare/3.0.3...3.1.0) - 2021-06-22
 ### Added
