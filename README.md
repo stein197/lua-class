@@ -12,6 +12,15 @@ return class "C" : extends (A, B) {}
 return class {}
 return class : A {}
 return class : extends (A, B) {}
+
+local o = class.Object()
+o:instanceof(class.Object)
+o:clone()
+local c = o:getClass()
+
+c:getName()
+c:getMeta()
+
 ```
 
 ## Testing
