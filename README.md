@@ -7,10 +7,10 @@ Sometimes there is a need to use classes in language that does not support them 
 local class = require "lua-class"
 
 return class "A" {}
-return class "B" : A
+return class "B" : A -- Slow, because it iterates through local variables
 return class "C" : extends (A, B) {}
 return class {}
-return class : A {}
+return class : A {} -- Slow, because it iterates through local variables
 return class : extends (A, B) {}
 
 local o = class.Object()
