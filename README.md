@@ -2,6 +2,8 @@
 ## Basic concepts
 Sometimes there is a need to use classes in language that does not support them at all. Fortunately, lua allows us to use some sort of object-oriented paradigm by its dynamic nature. This simple lua package allows to use object-oriented paradigm by using usual keyword `class`.
 
+![](syntax.svg)
+
 ## Usage
 ```lua
 local class = require "lua-class"
