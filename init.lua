@@ -15,15 +15,11 @@ local function isclass(t)
 	-- return type(t) == "table" and 
 end
 
-local function getlocal(stack, index)
-	return debug.getlocal(stack, index)
-end
-
 local function findlocalclass(classname)
 	local ok, name, value
 	for i = 1, math.huge do
 		for j = 1, math.huge do
-			ok, name, value = pcall(getlocal, i, j)
+			ok, name, value = pcall(debug.getlocal, i, j)
 			if not ok then
 				return
 			end
