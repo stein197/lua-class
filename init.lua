@@ -4,6 +4,8 @@ local MSG_LOCAL_CLASS_NOT_FOUND <const> = "Local class \"%s\" not found among lo
 local STRING_EXTENDS            <const> = "extends"
 local REGEX_NAME                <const> = "^%a%w*$"
 
+local metadata = {}
+
 local function validatename(name)
 	if not name:match(REGEX_NAME) then
 		error(string.format(MSG_INVALID_NAME, name))
